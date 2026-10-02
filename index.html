@@ -227,6 +227,7 @@ textarea.wide:disabled { background:#eee; color:#888; opacity:.6; }
   .screen-only { display:none !important; }
   .section { box-shadow:none; border:1px solid #999; break-inside: avoid; }
   table.form-tbl input, table.form-tbl textarea, select.grade-sel, textarea.wide { background:#fff !important; border:1px solid #bbb !important; color:#000 !important; }
+  .print-wrap, .print-wrap * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
 }
 .print-only { display:none; }
 
@@ -903,7 +904,7 @@ function renderDetail(id){
     ${selfOnlyMode && isPastSelfDeadline() && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(state.config?.deadlineSelf||'')})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
     ${r3GateNote ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
 
-    <div class="section">
+    <div class="section screen-only">
       <h2><span class="num">1</span>자기업적 (수치화 가능한 성과)</h2>
       <p class="note">${tpl.guide}</p>
       <div class="achv-cards">${achvCards}</div>
@@ -917,19 +918,19 @@ function renderDetail(id){
       </div>
     </div>
 
-    <div class="section">
+    <div class="section screen-only">
       <h2><span class="num">2</span>부족한 부분</h2>
       <p class="note">2026년 활동을 기준으로, 목표 대비 미흡했던 부분·기대에 미치지 못한 영역을 구체적으로 기술</p>
       <textarea class="wide" id="f-shortfalls" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.shortfalls)}</textarea>
     </div>
 
-    <div class="section">
+    <div class="section screen-only">
       <h2><span class="num">3</span>보완해야 할 사항</h2>
       <p class="note">부족한 부분을 개선하기 위해 향후 취해야 할 구체적 행동/계획</p>
       <textarea class="wide" id="f-improvements" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.improvements)}</textarea>
     </div>
 
-    <div class="section">
+    <div class="section screen-only">
       <h2><span class="num">4</span>임원 역량 평가</h2>
       <p class="note">정량 실적 외 임원으로서의 역량·리더십을 평가합니다.</p>
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
@@ -946,7 +947,7 @@ function renderDetail(id){
       </div>
     </div>
 
-    <div class="section">
+    <div class="section screen-only">
       <h2><span class="num">5</span>종합 등급 평가</h2>
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <table class="form-tbl" style="width:100%;">
@@ -1040,18 +1041,18 @@ function renderPrintSheet(rec, tpl){
       <td style="text-align:center;">${i+1}</td>
       <td style="text-align:center;">${a.req?'필수':'예시'}</td>
       <td>${escapeHtml(a.label)}</td>
-      <td>${escapeHtml(a.prev)||'-'}</td>
-      <td>${escapeHtml(a.target)||'-'}</td>
-      <td>${escapeHtml(a.actual)||'-'}</td>
-      <td>${escapeHtml(a.impact)||'-'}</td>
+      <td style="background:#E2F0D9;">${escapeHtml(a.prev)||'-'}</td>
+      <td style="background:#E2F0D9;">${escapeHtml(a.target)||'-'}</td>
+      <td style="background:#E2F0D9;">${escapeHtml(a.actual)||'-'}</td>
+      <td style="background:#E2F0D9;">${escapeHtml(a.impact)||'-'}</td>
     </tr>`).join("");
 
   const compRows = rec.competencies.map(c=>`
     <tr>
       <td><b>${escapeHtml(c.label)}</b><br><span style="font-size:10.5px;color:#666;">${escapeHtml(c.desc)}</span></td>
-      <td style="text-align:center;">${c.self||'-'}</td>
-      <td style="text-align:center;">${c.r1||'-'}</td>
-      <td style="text-align:center;">${c.r2||'-'}</td>
+      <td style="text-align:center; background:#E2F0D9;">${c.self||'-'}</td>
+      <td style="text-align:center; background:#FCE4D6;">${c.r1||'-'}</td>
+      <td style="text-align:center; background:#FCE4D6;">${c.r2||'-'}</td>
       <td></td>
     </tr>`).join("");
 
@@ -1063,6 +1064,12 @@ function renderPrintSheet(rec, tpl){
       <tr><th>성명</th><td>${escapeHtml(rec.name)}</td><th>직위</th><td>${escapeHtml(rec.title||'')}</td></tr>
       <tr><th>소속</th><td>${escapeHtml(rec.dept||'')}</td><th>평가기간</th><td>${escapeHtml(rec.evalPeriod)}</td></tr>
     </table>
+    <p style="font-size:11.5px; margin:0 0 14px;">
+      <span style="background:#E2F0D9; padding:2px 8px; border-radius:4px;">■ 본인 작성</span>
+      &nbsp;&nbsp;
+      <span style="background:#FCE4D6; padding:2px 8px; border-radius:4px;">■ 평가자(1차·2차) 작성</span>
+      &nbsp;&nbsp; 흰 칸(3차)은 3차 평가자가 직접 기입합니다.
+    </p>
 
     <div class="section" style="break-inside:avoid;">
       <h2>1. 자기업적</h2>
@@ -1094,8 +1101,8 @@ function renderPrintSheet(rec, tpl){
       <table class="form-tbl">
         <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차(수기)</th></tr></thead>
         <tbody>
-          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center;">${rec.overall.achv.r2||'-'}</td><td></td></tr>
-          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center;">${rec.overall.improve.r2||'-'}</td><td></td></tr>
+          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r2||'-'}</td><td></td></tr>
+          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r2||'-'}</td><td></td></tr>
         </tbody>
       </table>
     </div>
