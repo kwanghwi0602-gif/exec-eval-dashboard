@@ -243,9 +243,10 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
 .achv-card.required { border-left:5px solid var(--navy); }
 .achv-card.example { border-left:5px solid #c9ccd1; }
 .achv-card-head {
-  display:flex; align-items:center; gap:10px; padding:14px 18px;
+  display:flex; align-items:center; gap:10px; padding:14px 18px; flex-wrap:wrap;
   background:var(--gray-bg); border-bottom:1px solid var(--line);
 }
+.achv-card-head .label-input { min-width: 140px; }
 .achv-no { width:28px; height:28px; border-radius:50%; background:var(--navy); color:#fff;
   display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; }
 .achv-card-head .req-tag, .achv-card-head .ex-tag { flex-shrink:0; }
@@ -284,6 +285,26 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
   .app { padding: 18px 12px 48px; }
   table.form-tbl { font-size: 12px; }
   .section { padding: 16px 14px; }
+
+  /* iOS Safari는 입력칸 글자가 16px보다 작으면 탭할 때 화면을 확 당겨서(자동 확대) 보여주는데,
+     그때마다 화면이 흔들려서 거슬리므로 모바일에서는 입력요소 글자를 16px 이상으로 고정 */
+  input, select, textarea, .field input, .field select,
+  select.grade-sel, textarea.wide, .achv-field textarea, .achv-impact textarea,
+  .achv-card-head .label-input {
+    font-size: 16px !important;
+  }
+  select.grade-sel { padding: 9px 4px; }
+
+  /* 버튼·체크박스 등 터치 영역을 손가락으로 누르기 편한 크기로 확대 */
+  .btn { padding: 10px 16px; }
+  .btn-sm { padding: 9px 13px; font-size: 13px; }
+  table.list input[type="checkbox"], #select-all { width:20px !important; height:20px !important; }
+  .role-switch button, .linklike { padding: 8px 6px; }
+
+  /* 좁은 화면에서는 버튼들이 세로로 쌓여도 자연스럽게 */
+  .actions-row { width: 100%; }
+  .formhead { flex-direction: column; align-items: stretch; }
+  .formhead .actions-row { justify-content: flex-start; }
 }
 </style>
 </head>
@@ -960,6 +981,7 @@ function renderDetail(id){
     <div class="section screen-only">
       <h2><span class="num">5</span>종합 등급 평가</h2>
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
+      <div class="table-wrap" style="border:none;">
       <table class="form-tbl" style="width:100%;">
         <thead><tr><th>평가 영역</th><th>1차평가</th><th>2차평가</th><th>3차평가</th></tr></thead>
         <tbody>
@@ -977,6 +999,7 @@ function renderDetail(id){
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <div class="section screen-only">
