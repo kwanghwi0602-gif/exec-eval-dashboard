@@ -251,12 +251,12 @@ textarea.wide:disabled { background:#eee; color:#888; opacity:.6; }
 .achv-card-body { padding:18px; }
 .achv-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
 .achv-field label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
-.achv-field input {
-  width:100%; height:54px; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:16px;
-  font-weight:600; background:var(--green); color:var(--text); font-family:inherit;
+.achv-field textarea {
+  width:100%; min-height:130px; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:15px;
+  font-weight:600; background:var(--green); color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
 }
-.achv-field input:focus { outline:2px solid var(--green-strong); border-color:transparent; }
-.achv-field input:disabled { background:#eee !important; color:#888 !important; opacity:.6; }
+.achv-field textarea:focus { outline:2px solid var(--green-strong); border-color:transparent; }
+.achv-field textarea:disabled { background:#eee !important; color:#888 !important; opacity:.6; }
 .achv-impact label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
 .achv-impact textarea {
   width:100%; min-height:150px; padding:13px 14px; border:1px solid var(--line); border-radius:9px;
@@ -827,9 +827,9 @@ function renderDetail(id){
       </div>
       <div class="achv-card-body">
         <div class="achv-grid3">
-          <div class="achv-field"><label>전년 실적</label><input type="text" data-ach="${i}" data-f="prev" value="${escapeHtml(a.prev)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
-          <div class="achv-field"><label>2026 목표</label><input type="text" data-ach="${i}" data-f="target" value="${escapeHtml(a.target)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
-          <div class="achv-field"><label>2026 실적</label><input type="text" data-ach="${i}" data-f="actual" value="${escapeHtml(a.actual)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
+          <div class="achv-field"><label>전년 실적</label><textarea data-ach="${i}" data-f="prev" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.prev)}</textarea></div>
+          <div class="achv-field"><label>2026 목표</label><textarea data-ach="${i}" data-f="target" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.target)}</textarea></div>
+          <div class="achv-field"><label>2026 실적</label><textarea data-ach="${i}" data-f="actual" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.actual)}</textarea></div>
         </div>
         <div class="achv-impact">
           <label>주요성과 및 경영효과</label>
