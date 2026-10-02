@@ -160,7 +160,7 @@ table.list tr:hover td { background: #fafbfd; }
 }
 .section h2 { display:flex; align-items:center; gap:9px; color: var(--navy); padding-bottom: 10px; border-bottom: 2px solid var(--navy); margin-bottom: 12px;}
 .section h2 .num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:var(--navy); color:#fff; font-size:12px; }
-.note { font-size: 12.5px; color: var(--text-dim); font-style: italic; margin: 0 0 12px; line-height:1.55; }
+.note { font-size: 13.5px; color: #4b5563; font-style: normal; font-weight: 500; margin: 0 0 12px; line-height:1.6; }
 .note.strong { color: var(--orange-ink); font-weight:700; font-style:normal; background: var(--orange); padding:8px 11px; border-radius:7px; }
 
 .legend-row { display:flex; gap: 10px; margin-bottom: 18px; flex-wrap:wrap; }
@@ -407,6 +407,7 @@ function newRecord(name, dept, title, position, empId) {
     improvements: "",
     competencies: TEMPLATES[position].competencies.map(c => ({ label:c.label, desc:c.desc, self:"", r1:"", r2:"", r3:"" })),
     overall: { achv:{r1:"",r2:"",r3:""}, improve:{r1:"",r2:"",r3:""} },
+    comments: { r1:"", r2:"" }, // 1차/2차 평가자 코멘트 (선택)
     submitted: { self:false, r1:false, r2:false, r3:false, selfAt:null, r1At:null, r2At:null, r3At:null },
   };
 }
@@ -545,6 +546,7 @@ function normalizeRecord(rec){
   // 이전 버전 호환: locked 속성이 없으면 처음 5개만 고정(삭제불가)으로 간주
   (rec.achievements||[]).forEach((a,i) => { if (a.locked === undefined) a.locked = i < 5; });
   if (rec.deadlineOverride === undefined) rec.deadlineOverride = "";
+  if (!rec.comments) rec.comments = { r1:"", r2:"" };
   return rec;
 }
 
@@ -643,8 +645,7 @@ function renderGate(){
     return `
       <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
         <div style="font-size:28px; margin-bottom:6px;">🔒</div>
-        <h2 style="margin-bottom:6px;">아이디(사번)를 입력해 주세요</h2>
-        <p class="note" style="margin-bottom:18px;">피평가자 본인 / 인사팀 / 팀장 / 1차 평가자 / 2차 평가자 — 본인에게 등록된 사번을 입력하면 다음 단계로 진행합니다.</p>
+        <h2 style="margin-bottom:18px;">아이디(사번)를 입력해 주세요</h2>
         <input type="text" id="g-empid" placeholder="사번 입력" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; text-align:center; margin-bottom:12px;" />
         <button class="btn btn-primary" id="g-id-ok" style="width:100%; justify-content:center;">다음</button>
         <p class="note" id="g-err" style="color:#b3261e; margin-top:10px; display:none;">등록된 사번이 아닙니다.</p>
@@ -881,9 +882,9 @@ function renderDetail(id){
       </div>
       <div class="achv-card-body">
         <div class="achv-grid3">
-          <div class="achv-field"><label>전년 실적</label><textarea data-ach="${i}" data-f="prev" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.prev)}</textarea></div>
-          <div class="achv-field"><label>2026 목표</label><textarea data-ach="${i}" data-f="target" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.target)}</textarea></div>
-          <div class="achv-field"><label>2026 실적</label><textarea data-ach="${i}" data-f="actual" ${fieldDisabled(id,["self"])} placeholder="-">${escapeHtml(a.actual)}</textarea></div>
+          <div class="achv-field"><label>전년 실적</label><textarea data-ach="${i}" data-f="prev" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.prev)}</textarea></div>
+          <div class="achv-field"><label>2026 목표</label><textarea data-ach="${i}" data-f="target" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.target)}</textarea></div>
+          <div class="achv-field"><label>2026 실적</label><textarea data-ach="${i}" data-f="actual" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.actual)}</textarea></div>
         </div>
         <div class="achv-impact">
           <label>주요성과 및 경영효과</label>
@@ -953,10 +954,10 @@ function renderDetail(id){
       <p class="note">${tpl.guide}</p>
       <div class="achv-cards">${achvCards}</div>
       ${achvCanEdit ? `<button class="btn btn-primary" id="btn-achv-add" style="margin-top:14px; padding:12px 22px; font-size:14.5px;">➕ 항목 추가</button>` : ''}
-      <div class="card" style="margin-top:16px; padding:14px 18px; background:var(--gray-bg); box-shadow:none;">
-        <p style="font-weight:700; font-size:13px; margin-bottom:8px;">💡 참고 예시 항목</p>
-        <p class="note" style="margin-bottom:8px;">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
-        <ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-dim); line-height:1.9;">
+      <div class="card" style="margin-top:16px; padding:16px 20px; background:#FFF8E6; border:1px solid #F3DE9C; border-left:4px solid #E8A33D; box-shadow:none;">
+        <p style="font-weight:800; font-size:14px; margin-bottom:8px; color:#8A5A00;">💡 참고 예시 항목</p>
+        <p style="margin-bottom:10px; font-size:13px; color:#8A5A00;">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
+        <ul style="margin:0; padding-left:20px; font-size:13.5px; color:#5c4000; line-height:2.1; font-weight:500;">
           ${referenceExamples(rec.position).map(a=>`<li>${escapeHtml(a.label)}</li>`).join("")}
         </ul>
       </div>
@@ -1012,8 +1013,25 @@ function renderDetail(id){
     </div>
 
     <div class="section screen-only">
-      <h2><span class="num">6</span>최종 종합등급 산출</h2>
-      <p class="note">아래는 최종 등급이 어떻게 산출되는지 보여주는 참고용 안내이며, 3차 평가자가 인쇄물에서 최종 확정합니다.</p>
+      <h2><span class="num">6</span>코멘트 <span style="font-size:12px; font-weight:600; color:var(--text-dim);">(선택 — 필요시 작성)</span></h2>
+      <p class="note">자유롭게 남기고 싶은 의견이 있을 때만 작성해 주세요. 최종 제출 여부와는 무관합니다.</p>
+      <div class="field" style="margin-bottom:16px;">
+        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;">1차 평가자 코멘트</label>
+        ${selfOnlyMode
+          ? mask("")
+          : `<textarea class="wide" id="f-comment-r1" ${fieldDisabled(id,["r1"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:90px;">${escapeHtml(rec.comments?.r1||"")}</textarea>`}
+      </div>
+      <div class="field">
+        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;">2차 평가자 코멘트</label>
+        ${selfOnlyMode
+          ? mask("")
+          : `<textarea class="wide" id="f-comment-r2" ${fieldDisabled(id,["r2"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:90px;">${escapeHtml(rec.comments?.r2||"")}</textarea>`}
+      </div>
+    </div>
+
+    <div class="section screen-only">
+      <h2><span class="num">7</span>최종 종합등급 산출</h2>
+      <p class="note">아래는 최종 등급이 어떻게 산출되는지 보여주는 참고용 자료입니다.</p>
       <div class="formula-box">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
       <table class="grade-ref">
         <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
@@ -1153,7 +1171,15 @@ function renderPrintSheet(rec, tpl){
     </div>
 
     <div class="section" style="break-inside:avoid;">
-      <h2>6. 최종 종합등급 산출 (3차 평가자 기입)</h2>
+      <h2>6. 코멘트 (선택)</h2>
+      <table class="form-tbl">
+        <tr><th style="width:18%;">1차 평가자</th><td style="${wrapStyle}">${escapeHtml(rec.comments?.r1) || '(작성 내용 없음)'}</td></tr>
+        <tr><th>2차 평가자</th><td style="${wrapStyle}">${escapeHtml(rec.comments?.r2) || '(작성 내용 없음)'}</td></tr>
+      </table>
+    </div>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>7. 최종 종합등급 산출 (3차 평가자 기입)</h2>
       <div class="formula-box" style="background:#f2f2f2;">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
       <table class="grade-ref">
         <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
@@ -1430,6 +1456,8 @@ function attachHandlers(){
   });
   document.getElementById("f-shortfalls")?.addEventListener("input", (e)=>{ rec.shortfalls = e.target.value; dirty=true; markDirty(); });
   document.getElementById("f-improvements")?.addEventListener("input", (e)=>{ rec.improvements = e.target.value; dirty=true; markDirty(); });
+  document.getElementById("f-comment-r1")?.addEventListener("input", (e)=>{ rec.comments.r1 = e.target.value; dirty=true; markDirty(); });
+  document.getElementById("f-comment-r2")?.addEventListener("input", (e)=>{ rec.comments.r2 = e.target.value; dirty=true; markDirty(); });
 
   document.querySelectorAll("[data-comp]").forEach(cell=>{
     const sel = cell.querySelector("select");
