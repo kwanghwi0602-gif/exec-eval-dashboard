@@ -391,6 +391,8 @@ let state = {
   gateStep:null,           // 전역 로그인 2단계(사번→비밀번호) 진행 중 임시 상태: { role, empId, needsSetup }
 };
 
+let selectedForDelete = new Set(); // 목록 화면 일괄삭제 체크박스 선택 상태 (세션 한정)
+
 function isPastSelfDeadline(){
   const d = state.config && state.config.deadlineSelf;
   if (!d) return false;
@@ -666,10 +668,15 @@ function renderList(){
     if (titleCmp !== 0) return titleCmp;
     return (a.name||"").localeCompare(b.name||"", "ko");
   });
+  // 선택 목록에서 더 이상 존재하지 않는 id 제거(삭제 후 재렌더 대비)
+  [...selectedForDelete].forEach(id => { if (!state.records[id]) selectedForDelete.delete(id); });
+  const allSelected = admin && ids.length > 0 && ids.every(id => selectedForDelete.has(id));
+
   const rows = ids.map(id=>{
     const r = state.records[id];
     const posTag = r.position === "sales" ? '<span class="pos-tag pos-sales">영업직</span>' : '<span class="pos-tag pos-nonsales">비영업직</span>';
     return `<tr data-open="${id}">
+      ${admin ? `<td style="width:36px;" onclick="event.stopPropagation()"><input type="checkbox" data-select-id="${id}" ${selectedForDelete.has(id)?'checked':''} style="width:16px;height:16px;"/></td>` : ''}
       <td><b>${escapeHtml(r.name)}</b></td>
       <td>${escapeHtml(r.dept||"")}</td>
       <td>${escapeHtml(r.title||"")}</td>
@@ -689,7 +696,10 @@ function renderList(){
   const tableOrEmpty = ids.length ? `
     <div class="table-wrap">
       <table class="list">
-        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th><th></th></tr></thead>
+        <thead><tr>
+          ${admin ? `<th style="width:36px;"><input type="checkbox" id="select-all" ${allSelected?'checked':''} style="width:16px;height:16px;"/></th>` : ''}
+          <th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th><th></th>
+        </tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>` : `
@@ -706,6 +716,7 @@ function renderList(){
     <div class="hero">
       <div><h1>임원 인사평가 현황</h1><p>본인 작성 → 1차 평가 → 2차 평가까지 온라인으로 진행합니다. 3차(최종) 평가는 인쇄물로 진행해 주세요. (${escapeHtml(loggedInAs)}(으)로 접속 중)</p></div>
       <div class="actions-row">
+        ${admin && selectedForDelete.size ? `<button class="btn btn-danger" id="btn-bulk-del">선택 삭제 (${selectedForDelete.size})</button>` : ''}
         ${admin ? `<button class="btn btn-ghost" id="btn-bulk-add">📤 엑셀로 일괄 추가</button>` : ''}
         ${admin ? `<button class="btn btn-primary" id="btn-add">+ 임원 추가</button>` : ''}
       </div>
@@ -819,10 +830,10 @@ function renderDetail(id){
     <div class="achv-card ${a.req?'required':'example'}">
       <div class="achv-card-head">
         <div class="achv-no">${i+1}</div>
-        ${a.req ? '<span class="req-tag">필수</span>' : '<span class="ex-tag">예시</span>'}
+        ${a.req ? '<span class="req-tag">필수</span>' : ''}
         ${a.req
             ? `<input class="label-input" value="${escapeHtml(a.label)}" disabled />`
-            : `<input class="label-input" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="예시 항목 — 자유롭게 수정 가능"/>`}
+            : `<input class="label-input" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="아래 예시 항목을 참고하여 자유롭게 작성해 주세요"/>`}
         ${(!a.locked && achvCanEdit) ? `<button class="btn btn-danger btn-sm" data-ach-del="${i}" title="항목 삭제">삭제</button>` : ''}
       </div>
       <div class="achv-card-body">
@@ -1114,6 +1125,7 @@ function attachHandlers(){
       if (b.dataset.v === "logout"){
         state.globalRoles = new Set();
         state.view = "list"; state.recordId = null;
+        selectedForDelete.clear();
         render();
         return;
       }
@@ -1254,6 +1266,33 @@ function attachHandlers(){
     document.getElementById("btn-add")?.addEventListener("click", openAddModal);
     document.getElementById("btn-bulk-add")?.addEventListener("click", openBulkUploadModal);
     document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
+
+    document.querySelectorAll("[data-select-id]").forEach(cb=>{
+      cb.addEventListener("change", ()=>{
+        const id = cb.getAttribute("data-select-id");
+        if (cb.checked) selectedForDelete.add(id); else selectedForDelete.delete(id);
+        render();
+      });
+    });
+    document.getElementById("select-all")?.addEventListener("change", (e)=>{
+      const ids = Object.keys(state.records);
+      if (e.target.checked) ids.forEach(id => selectedForDelete.add(id));
+      else ids.forEach(id => selectedForDelete.delete(id));
+      render();
+    });
+    document.getElementById("btn-bulk-del")?.addEventListener("click", async ()=>{
+      const ids = [...selectedForDelete];
+      if (!ids.length) return;
+      const names = ids.map(id => state.records[id]?.name).filter(Boolean).join(", ");
+      if (!confirm(`선택한 ${ids.length}명(${names})을 삭제할까요? 되돌릴 수 없습니다.`)) return;
+      for (const id of ids){
+        try { await apiSend("/api/execs/" + encodeURIComponent(id), "DELETE"); } catch(e){ console.error(e); }
+        delete state.records[id];
+      }
+      selectedForDelete.clear();
+      toast(`${ids.length}명이 삭제되었습니다.`);
+      render();
+    });
     document.querySelectorAll("[data-open]").forEach(el=>{
       el.addEventListener("click", (e)=>{
         e.stopPropagation();
