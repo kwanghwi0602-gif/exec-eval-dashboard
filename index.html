@@ -192,7 +192,7 @@ select.grade-sel:disabled, input:disabled, textarea:disabled { opacity:.55; curs
 .col-narrow { width: 118px; }
 .col-grade { width: 90px; }
 
-textarea.wide { width:100%; min-height:120px; border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:13.5px; font-family:inherit; background:var(--green); color:var(--text); line-height:1.6; }
+textarea.wide { width:100%; min-height:220px; border:1px solid var(--line); border-radius:8px; padding:14px 16px; font-size:14.5px; font-family:inherit; background:var(--green); color:var(--text); line-height:1.7; }
 textarea.wide:focus { outline:2px solid var(--green-strong); }
 textarea.wide:disabled { background:#eee; color:#888; opacity:.6; }
 
@@ -252,14 +252,14 @@ textarea.wide:disabled { background:#eee; color:#888; opacity:.6; }
 .achv-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
 .achv-field label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
 .achv-field input {
-  width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:16px;
+  width:100%; height:54px; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:16px;
   font-weight:600; background:var(--green); color:var(--text); font-family:inherit;
 }
 .achv-field input:focus { outline:2px solid var(--green-strong); border-color:transparent; }
 .achv-field input:disabled { background:#eee !important; color:#888 !important; opacity:.6; }
 .achv-impact label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
 .achv-impact textarea {
-  width:100%; min-height:90px; padding:13px 14px; border:1px solid var(--line); border-radius:9px;
+  width:100%; min-height:150px; padding:13px 14px; border:1px solid var(--line); border-radius:9px;
   font-size:15px; background:var(--green); color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
 }
 .achv-impact textarea:focus { outline:2px solid var(--green-strong); border-color:transparent; }
@@ -357,13 +357,13 @@ const TEMPLATES = {
   }
 };
 
-// 기본으로 카드에 채워 보여줄 5개(필수 전부 + 예시 일부) — 삭제 불가
+// 기본으로 카드에 채워 보여줄 5개(필수 전부 + 예시 자리) — 삭제 불가. 예시 자리는 항목명이 빈칸.
 function starterAchievements(position){
   return TEMPLATES[position].achievements.slice(0, 5);
 }
-// 기본 5개에 들어가지 않은 나머지 예시 — "참고 예시" 박스에 텍스트로만 노출
+// 모든 예시 항목 — "참고 예시" 박스에 텍스트로만 노출 (기본 카드의 예시 자리에 들어갈 내용도 포함)
 function referenceExamples(position){
-  return TEMPLATES[position].achievements.slice(5);
+  return TEMPLATES[position].achievements.filter(a => !a.req);
 }
 
 function newRecord(name, dept, title, position, empId) {
@@ -372,7 +372,7 @@ function newRecord(name, dept, title, position, empId) {
     evalPeriod: "2026.01.01 ~ 평가일",
     createdAt: Date.now(),
     codes: { self: { empId: String(empId||"").trim(), password: "" } },
-    achievements: starterAchievements(position).map(a => ({ label:a.label, req:a.req, prev:"", target:"", actual:"", impact:"", locked:true })),
+    achievements: starterAchievements(position).map(a => ({ label: a.req ? a.label : "", req:a.req, prev:"", target:"", actual:"", impact:"", locked:true })),
     shortfalls: "",
     improvements: "",
     competencies: TEMPLATES[position].competencies.map(c => ({ label:c.label, desc:c.desc, self:"", r1:"", r2:"", r3:"" })),
@@ -823,7 +823,7 @@ function renderDetail(id){
         ${a.req
             ? `<input class="label-input" value="${escapeHtml(a.label)}" disabled />`
             : `<input class="label-input" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="예시 항목 — 자유롭게 수정 가능"/>`}
-        ${(!a.locked && achvCanEdit) ? `<button class="btn btn-ghost btn-sm" data-ach-del="${i}" title="항목 삭제">🗑</button>` : ''}
+        ${(!a.locked && achvCanEdit) ? `<button class="btn btn-danger btn-sm" data-ach-del="${i}" title="항목 삭제">삭제</button>` : ''}
       </div>
       <div class="achv-card-body">
         <div class="achv-grid3">
@@ -896,7 +896,7 @@ function renderDetail(id){
       <h2><span class="num">1</span>자기업적 (수치화 가능한 성과)</h2>
       <p class="note">${tpl.guide}</p>
       <div class="achv-cards">${achvCards}</div>
-      ${achvCanEdit ? `<button class="btn btn-ghost" id="btn-achv-add" style="margin-top:14px;">+ 항목 추가</button>` : ''}
+      ${achvCanEdit ? `<button class="btn btn-primary" id="btn-achv-add" style="margin-top:14px; padding:12px 22px; font-size:14.5px;">➕ 항목 추가</button>` : ''}
       <div class="card" style="margin-top:16px; padding:14px 18px; background:var(--gray-bg); box-shadow:none;">
         <p style="font-weight:700; font-size:13px; margin-bottom:8px;">💡 참고 예시 항목</p>
         <p class="note" style="margin-bottom:8px;">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
@@ -924,8 +924,8 @@ function renderDetail(id){
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <table class="grade-ref">${gradeRefRows}</table>
       <div class="legend-row">
-        <div class="legend-chip me"><span class="sw"></span>본인평가 — 참고용</div>
-        <div class="legend-chip ev"><span class="sw"></span>1차·2차 평가 — 참고용 (3차가 최종 결정)</div>
+        <div class="legend-chip me"><span class="sw"></span>본인평가</div>
+        <div class="legend-chip ev"><span class="sw"></span>1차·2차 평가</div>
       </div>
       <div class="table-wrap" style="border:none;">
         <table class="form-tbl">
