@@ -226,7 +226,10 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
   .print-wrap { display:block; }
   .screen-only { display:none !important; }
   .section { box-shadow:none; border:none; break-inside: avoid; }
-  .section.boxed { border:1px solid #999; padding:12px 14px; }
+  .print-answer-box {
+    border:1px solid #999; border-radius:6px; padding:14px 16px; min-height:70px;
+    font-size:13px; line-height:1.7; white-space:pre-wrap; word-break:break-word;
+  }
   table.form-tbl input, table.form-tbl textarea, select.grade-sel, textarea.wide { background:#fff !important; border:1px solid #bbb !important; color:#000 !important; }
   .print-wrap, .print-wrap * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
   .print-wrap table.form-tbl { table-layout: fixed; }
@@ -1001,7 +1004,7 @@ function renderSubmitBar(rec, id, selfOnlyMode){
 
   const parts = [];
 
-  if (selfEditable || r1Editable || r2Editable || r3Editable){
+  if (selfEditable || r1Editable || r2Editable || r3Editable || isAdmin){
     const submitBtns = [];
     if (selfEditable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-self">✅ 본인 최종 제출</button>`);
     if (r1Editable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-r1">✅ 1차 평가 최종 제출</button>`);
@@ -1061,7 +1064,7 @@ function renderPrintSheet(rec, tpl){
       <td style="text-align:center; background:#E2F0D9;">${c.self||'-'}</td>
       <td style="text-align:center; background:#FCE4D6;">${c.r1||'-'}</td>
       <td style="text-align:center; background:#FCE4D6;">${c.r2||'-'}</td>
-      <td></td>
+      <td style="text-align:center;">${c.r3||''}</td>
     </tr>`).join("");
 
   return `
@@ -1088,19 +1091,20 @@ function renderPrintSheet(rec, tpl){
       </table>
     </div>
 
-    <div class="section boxed" style="break-inside:avoid;">
+    <div class="section" style="break-inside:avoid;">
       <h2>2. 부족한 부분</h2>
-      <p style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(rec.shortfalls) || '(작성 내용 없음)'}</p>
+      <div class="print-answer-box">${escapeHtml(rec.shortfalls) || '(작성 내용 없음)'}</div>
     </div>
-    <div class="section boxed" style="break-inside:avoid;">
+    <div class="section" style="break-inside:avoid;">
       <h2>3. 보완해야 할 사항</h2>
-      <p style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(rec.improvements) || '(작성 내용 없음)'}</p>
+      <div class="print-answer-box">${escapeHtml(rec.improvements) || '(작성 내용 없음)'}</div>
     </div>
 
     <div class="section" style="break-inside:avoid;">
-      <h2>4. 임원 역량 평가 (본인 / 1차 / 2차 / <u>3차-수기기입</u>)</h2>
+      <h2>4. 임원 역량 평가 (본인 / 1차 / 2차 / 3차)</h2>
+      <p style="font-size:11px; color:#666; margin:0 0 8px;">※ 3차 칸이 비어 있으면 3차 평가자가 직접 기입해 주세요.</p>
       <table class="form-tbl">
-        <thead><tr><th>평가 항목</th><th>본인</th><th>1차</th><th>2차</th><th>3차(수기)</th></tr></thead>
+        <thead><tr><th>평가 항목</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
         <tbody>${compRows}</tbody>
       </table>
     </div>
@@ -1108,10 +1112,10 @@ function renderPrintSheet(rec, tpl){
     <div class="section" style="break-inside:avoid;">
       <h2>5. 종합 등급 평가</h2>
       <table class="form-tbl">
-        <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차(수기)</th></tr></thead>
+        <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
         <tbody>
-          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r2||'-'}</td><td></td></tr>
-          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r2||'-'}</td><td></td></tr>
+          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r2||'-'}</td><td style="text-align:center;">${rec.overall.achv.r3||''}</td></tr>
+          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r2||'-'}</td><td style="text-align:center;">${rec.overall.improve.r3||''}</td></tr>
         </tbody>
       </table>
     </div>
