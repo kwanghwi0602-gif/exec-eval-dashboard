@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>2026년 임원 인사평가</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --navy: #1F3864;
+  --navy-deep: #15284a;
+  --navy-ink: #0f1f38;
+  --green: #E2F0D9;
+  --green-ink: #375623;
+  --green-strong: #6FA85C;
+  --orange: #FCE4D6;
+  --orange-ink: #833C00;
+  --orange-strong: #D98A4C;
+  --gray-bg: #F6F7F9;
+  --line: #DCE1E8;
+  --text: #22282f;
+  --text-dim: #6b7380;
+  --white: #ffffff;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(15,31,56,.06), 0 4px 16px rgba(15,31,56,.06);
+  --maxw: 1180px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
+    --green: #22361c; --green-ink: #bfe3ab; --orange: #3a2414; --orange-ink: #f2c49c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
+  --green: #22361c; --green-ink: #bfe3ab; --orange: #3a2414; --orange-ink: #f2c49c;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--gray-bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; }
+.app { max-width: var(--maxw); margin: 0 auto; padding: 28px 20px 64px; }
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--navy); color: #fff;
+  padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.topbar .brand { display:flex; align-items:center; gap:10px; font-weight: 700; letter-spacing: -0.01em; }
+.topbar .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange-strong); }
+.topbar .sub { font-size: 12.5px; color: #c7d0e0; font-weight: 500; }
+.topbar nav { display:flex; gap: 6px; }
+.topbar nav button {
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: #fff;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 600;
+  transition: background .15s;
+}
+.topbar nav button:hover { background: rgba(255,255,255,.18); }
+.topbar nav button.active { background: #fff; color: var(--navy); }
+
+h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.015em; }
+h2 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+.hero {
+  display:flex; align-items:flex-end; justify-content:space-between; gap: 16px;
+  margin: 26px 0 18px; flex-wrap: wrap;
+}
+.hero p { margin: 2px 0 0; color: var(--text-dim); font-size: 13.5px; }
+
+.btn {
+  display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
+  padding: 9px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 700;
+  transition: transform .08s ease, box-shadow .15s ease, background .15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--navy); color: #fff; }
+.btn-primary:hover { background: var(--navy-deep); }
+.btn-ghost { background: var(--white); color: var(--navy); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--gray-bg); }
+.btn-danger { background: #fff; color: #b3261e; border: 1px solid #f3c9c5; }
+.btn-danger:hover { background: #fff5f4; }
+.btn-sm { padding: 6px 11px; font-size: 12.5px; border-radius: 7px; }
+
+.card {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); background: var(--white); }
+table.list { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 760px; }
+table.list th {
+  text-align: left; padding: 12px 14px; background: var(--navy); color: #fff; font-weight: 700;
+  font-size: 12.5px; white-space: nowrap;
+}
+table.list td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: middle; }
+table.list tr:hover td { background: #fafbfd; }
+.pos-tag { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space:nowrap; }
+.pos-sales { background: #EAF2FF; color: #1d4ed8; }
+.pos-nonsales { background: #F3EAFE; color: #7e22ce; }
+.status-chip { display:inline-flex; align-items:center; gap:5px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.status-draft { background: #f1f2f4; color: #5b6472; }
+.status-self_done { background: var(--green); color: var(--green-ink); }
+.status-r1_done { background: #e4ecff; color: #2448b0; }
+.status-r2_done { background: var(--orange); color: var(--orange-ink); }
+.empty-state {
+  text-align:center; padding: 56px 20px; color: var(--text-dim);
+}
+.empty-state .big { font-size: 15px; color: var(--text); font-weight: 700; margin-bottom: 6px; }
+
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(10,16,28,.45); display:flex; align-items:center; justify-content:center;
+  z-index: 100; padding: 20px;
+}
+.modal {
+  background: var(--white); border-radius: 14px; padding: 24px; width: 100%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.modal h3 { margin: 0 0 14px; font-size: 17px; }
+.field { margin-bottom: 13px; }
+.field label { display:block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 5px; }
+.field input, .field select {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; font-size: 14px;
+  background: var(--white); color: var(--text); font-family: inherit;
+}
+.field input:focus, .field select:focus, textarea:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+.modal-actions { display:flex; justify-content:flex-end; gap: 8px; margin-top: 18px; }
+
+/* ---- detail/form view ---- */
+.back-row { display:flex; align-items:center; gap: 10px; margin-bottom: 6px; }
+.linklike { background:none; border:none; color: var(--navy); font-weight:700; font-size: 13.5px; cursor:pointer; padding: 4px 0; }
+.formhead {
+  display:flex; flex-wrap:wrap; gap: 14px 24px; align-items:flex-start; justify-content:space-between;
+  margin: 6px 0 20px;
+}
+.formhead .idblock h1 { margin-bottom: 2px; }
+.meta-row { display:flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 6px; font-size: 13px; color: var(--text-dim); }
+.meta-row b { color: var(--text); font-weight: 700; }
+.role-switch { display:flex; align-items:center; gap: 8px; background: var(--white); border:1px solid var(--line); border-radius: 999px; padding: 4px; box-shadow: var(--shadow); }
+.role-switch button {
+  border:none; background:none; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 700; cursor:pointer;
+  color: var(--text-dim);
+}
+.role-switch button.on { background: var(--navy); color:#fff; }
+.actions-row { display:flex; gap: 8px; flex-wrap: wrap; }
+
+.section {
+  background: var(--white); border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 20px 22px; margin-bottom: 18px;
+}
+.section h2 { display:flex; align-items:center; gap:9px; color: var(--navy); padding-bottom: 10px; border-bottom: 2px solid var(--navy); margin-bottom: 12px;}
+.section h2 .num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:var(--navy); color:#fff; font-size:12px; }
+.note { font-size: 12.5px; color: var(--text-dim); font-style: italic; margin: 0 0 12px; line-height:1.55; }
+.note.strong { color: var(--orange-ink); font-weight:700; font-style:normal; background: var(--orange); padding:8px 11px; border-radius:7px; }
+
+.legend-row { display:flex; gap: 10px; margin-bottom: 18px; flex-wrap:wrap; }
+.legend-chip { flex:1; min-width: 220px; padding: 9px 13px; border-radius: 8px; font-size: 12.5px; font-weight:700; display:flex; align-items:center; gap:7px; }
+.legend-chip.me { background: var(--green); color: var(--green-ink); }
+.legend-chip.ev { background: var(--orange); color: var(--orange-ink); }
+.legend-chip .sw { width:10px; height:10px; border-radius:3px; }
+.legend-chip.me .sw { background: var(--green-strong); }
+.legend-chip.ev .sw { background: var(--orange-strong); }
+
+table.form-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.form-tbl th { background: var(--navy); color:#fff; padding: 9px 8px; font-size: 11.5px; font-weight:700; text-align:center; }
+table.form-tbl td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: middle; }
+table.form-tbl td.label-cell { font-size:12.5px; }
+.req-tag, .ex-tag { display:inline-block; font-size:11px; font-weight:800; padding:2px 7px; border-radius:5px; }
+.req-tag { background: #dbe6fb; color: var(--navy); }
+.ex-tag { background:#eee; color:#888; }
+table.form-tbl input[type=text], table.form-tbl textarea {
+  width: 100%; border: 1px solid transparent; border-radius: 5px; padding: 10px 11px; font-size: 14.5px;
+  font-family: inherit; background: var(--green); color: var(--text);
+}
+table.form-tbl input[type=text]:focus, table.form-tbl textarea:focus { border-color: var(--green-strong); outline:none; }
+table.form-tbl textarea { resize: vertical; min-height: 56px; }
+select.grade-sel {
+  width: 100%; padding: 6px 4px; border-radius: 5px; border:1px solid transparent; font-weight:700; text-align:center;
+  font-size: 13px; background: var(--green); color: var(--green-ink); font-family:inherit;
+}
+select.grade-sel.ev { background: var(--orange); color: var(--orange-ink); }
+select.grade-sel:disabled, input:disabled, textarea:disabled { opacity:.55; cursor:not-allowed; background:#eee !important; color:#888 !important; }
+.col-narrow { width: 118px; }
+.col-grade { width: 90px; }
+
+textarea.wide { width:100%; min-height:120px; border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:13.5px; font-family:inherit; background:var(--green); color:var(--text); line-height:1.6; }
+textarea.wide:focus { outline:2px solid var(--green-strong); }
+textarea.wide:disabled { background:#eee; color:#888; opacity:.6; }
+
+.grade-ref { width:100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 4px; }
+.grade-ref th, .grade-ref td { border:1px solid var(--line); padding:6px; text-align:center; }
+.grade-ref th { background: var(--gray-bg); font-weight:700; width: 70px;}
+
+.formula-box { background: var(--gray-bg); border:1px solid var(--line); border-radius:8px; padding: 12px 14px; font-size: 13.5px; font-weight:700; color: var(--navy); margin-bottom:12px; }
+
+.savebar {
+  position: sticky; bottom: env(safe-area-inset-bottom, 0px); margin-top: 10px;
+  background: var(--white); border:1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  padding: 12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+}
+.savebar .save-msg { font-size: 12.5px; color: var(--text-dim); }
+.savebar .save-msg.ok { color: var(--green-ink); font-weight:700; }
+
+.toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: var(--navy-ink); color:#fff; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight:600;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3); z-index: 300; opacity:0; pointer-events:none; transition: opacity .25s, transform .25s;
+}
+.toast.show { opacity:1; transform: translateX(-50%) translateY(-6px); }
+
+/* print view */
+.print-wrap { display:none; }
+@media print {
+  .topbar, .hero, .actions-row, .role-switch, .savebar, .card.listcard, .btn, .print-hide { display:none !important; }
+  body { background:#fff; }
+  .app { max-width:none; padding:0; }
+  .print-wrap { display:block; }
+  .screen-only { display:none !important; }
+  .section { box-shadow:none; border:1px solid #999; break-inside: avoid; }
+  table.form-tbl input, table.form-tbl textarea, select.grade-sel, textarea.wide { background:#fff !important; border:1px solid #bbb !important; color:#000 !important; }
+}
+.print-only { display:none; }
+
+/* ---- 카드형 자기업적 레이아웃 ---- */
+.achv-cards { display:flex; flex-direction:column; gap:16px; }
+.achv-card { background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
+.achv-card.required { border-left:5px solid var(--navy); }
+.achv-card.example { border-left:5px solid #c9ccd1; }
+.achv-card-head {
+  display:flex; align-items:center; gap:10px; padding:14px 18px;
+  background:var(--gray-bg); border-bottom:1px solid var(--line);
+}
+.achv-no { width:28px; height:28px; border-radius:50%; background:var(--navy); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; }
+.achv-card-head .req-tag, .achv-card-head .ex-tag { flex-shrink:0; }
+.achv-card-head .label-input {
+  flex:1; border:none; background:transparent; font-size:16px; font-weight:700; color:var(--text);
+  padding:4px 2px; font-family:inherit;
+}
+.achv-card-head .label-input:disabled { color:var(--text); opacity:1; -webkit-text-fill-color:var(--text); background:transparent !important; cursor:default; }
+.achv-card-head .label-input:not(:disabled):focus { outline:2px solid var(--green-strong); border-radius:4px; background:#fff; }
+.achv-card-body { padding:18px; }
+.achv-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
+.achv-field label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
+.achv-field input {
+  width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:16px;
+  font-weight:600; background:var(--green); color:var(--text); font-family:inherit;
+}
+.achv-field input:focus { outline:2px solid var(--green-strong); border-color:transparent; }
+.achv-field input:disabled { background:#eee !important; color:#888 !important; opacity:.6; }
+.achv-impact label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
+.achv-impact textarea {
+  width:100%; min-height:90px; padding:13px 14px; border:1px solid var(--line); border-radius:9px;
+  font-size:15px; background:var(--green); color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
+}
+.achv-impact textarea:focus { outline:2px solid var(--green-strong); border-color:transparent; }
+.achv-impact textarea:disabled { background:#eee !important; color:#888 !important; opacity:.6; }
+@media (max-width:640px){
+  .achv-grid3 { grid-template-columns:1fr; }
+}
+
+.spinner { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; animation: spin .7s linear infinite; display:inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .topbar { padding: 12px 14px; }
+  .topbar .sub { display:none; }
+  .app { padding: 18px 12px 48px; }
+  table.form-tbl { font-size: 12px; }
+  .section { padding: 16px 14px; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> 2026 임원 인사평가 <span class="sub">인재개발팀</span></div>
+  <nav id="topnav"></nav>
+</div>
+
+<div class="app" id="app">
+  <div class="empty-state">불러오는 중…</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== 템플릿 데이터 (워드 최종본 기준) ===================== */
+
+const GRADE_DEF = [
+  { g:"S", label:"탁월", score:100 },
+  { g:"A", label:"우수", score:90 },
+  { g:"B", label:"보통", score:80 },
+  { g:"C", label:"미흡", score:70 },
+  { g:"D", label:"부족", score:60 },
+];
+
+const TEMPLATES = {
+  sales: {
+    label: "영업직",
+    guide: "No.1~3은 필수 작성 항목입니다. No.4 이후는 예시를 참고하여 그대로 사용하거나 직접 다른 항목을 작성하셔도 되며, 필수 3개를 포함해 최소 5개 이상 작성해 주세요.",
+    achievements: [
+      { req:true,  label:"매출액 (담당 사업·채널 목표 대비 실적)" },
+      { req:true,  label:"영업이익 / 손익 달성률" },
+      { req:true,  label:"거래처·매장 관리성과 (바이어 관리, 매장 운영, 신규거래처 확보·유지 등)" },
+      { req:false, label:"매장·거래처 운영관리 성과 (VMD·프로모션, 인원관리 등)" },
+      { req:false, label:"재고관리 지표 (재고회전율, 결품률)" },
+      { req:false, label:"계약 건수 / 수주 금액" },
+      { req:false, label:"시장점유율 변화율" },
+      { req:false, label:"채권 회수율 / 미수금 비율" },
+      { req:false, label:"할인율 / 판촉비 관리 및 매출총이익률" },
+      { req:false, label:"거래처 유지율 / 재계약률" },
+    ],
+    competencies: [
+      { label:"리더십 / 조직관리", desc:"조직 목표 제시, 구성원 동기부여, 성과 관리의 실효성" },
+      { label:"전략적 사고 / 시장통찰", desc:"시장·고객 변화 예측, 중장기 영업전략 수립 및 실행력" },
+      { label:"고객관계 관리", desc:"핵심 거래처 신뢰 구축, 장기적 파트너십 유지·확대" },
+      { label:"협상 / 문제해결", desc:"가격·조건 협상력, 돌발 이슈 및 클레임 대응 역량" },
+      { label:"인재육성 / 승계관리", desc:"후속 영업인력 발굴·육성, 노하우 전수 및 조직 역량 강화" },
+      { label:"윤리경영 / 준법", desc:"영업 과정의 공정성·투명성, 사내외 규정 및 윤리기준 준수" },
+    ],
+  },
+  nonsales: {
+    label: "비영업직",
+    guide: "No.1~2는 필수 작성 항목입니다. No.3 이후는 예시를 참고하여 그대로 사용하거나 직접 다른 항목을 작성하셔도 되며, 필수 2개를 포함해 최소 5개 이상 작성해 주세요.",
+    achievements: [
+      { req:true,  label:"핵심 과제(프로젝트) 목표 달성률" },
+      { req:true,  label:"담당 조직·업무 운영 지표 (품질, 처리효율, 만족도 등)" },
+      { req:false, label:"예산 집행 효율 / 비용 관리 (예산 대비 실적, 비용 절감액 등)" },
+      { req:false, label:"결산 정확성·적시성 및 자금 운용 효율성" },
+      { req:false, label:"시즌 신제품 개발 건수 및 히트상품 비율" },
+      { req:false, label:"브랜드 인지도 · 캠페인 ROI(매출 기여도)" },
+      { req:false, label:"중장기 전략과제 추진율 및 신사업 매출·이익 기여도" },
+      { req:false, label:"계약 적기처리율 / 분쟁 예방금액 / 평균 처리기간" },
+      { req:false, label:"시즌 물량 판매율(Sell-through), 재고 소진율/악성재고 비율" },
+      { req:false, label:"수입 리드타임 준수율, 통관·품질검수 불량률, 발주 대비 입고 정확도" },
+    ],
+    competencies: [
+      { label:"리더십 / 조직관리", desc:"조직 목표 제시, 구성원 동기부여, 성과 관리의 실효성" },
+      { label:"전략적 사고 / 의사결정", desc:"경영환경 분석, 우선순위 판단 및 의사결정의 적시성·정확성" },
+      { label:"부서 간 협업 / 소통", desc:"타 부서와의 조율, 전사 관점의 커뮤니케이션 및 지원 역량" },
+      { label:"혁신 / 변화주도", desc:"프로세스 개선, 신규 제도·시스템 도입 및 변화관리 추진력" },
+      { label:"인재육성 / 승계관리", desc:"핵심 인재 발굴·육성, 후계자 양성 및 조직 역량 강화" },
+      { label:"윤리경영 / 리스크 관리", desc:"법규·내부통제 준수, 리스크 사전 인지 및 대응 체계 운영" },
+    ],
+  }
+};
+
+// 기본으로 카드에 채워 보여줄 5개(필수 전부 + 예시 일부) — 삭제 불가
+function starterAchievements(position){
+  return TEMPLATES[position].achievements.slice(0, 5);
+}
+// 기본 5개에 들어가지 않은 나머지 예시 — "참고 예시" 박스에 텍스트로만 노출
+function referenceExamples(position){
+  return TEMPLATES[position].achievements.slice(5);
+}
+
+function newRecord(name, dept, title, position, empId) {
+  return {
+    name, dept, title, position,
+    evalPeriod: "2026.01.01 ~ 평가일",
+    createdAt: Date.now(),
+    codes: { self: { empId: String(empId||"").trim(), password: "" } },
+    achievements: starterAchievements(position).map(a => ({ label:a.label, req:a.req, prev:"", target:"", actual:"", impact:"", locked:true })),
+    shortfalls: "",
+    improvements: "",
+    competencies: TEMPLATES[position].competencies.map(c => ({ label:c.label, desc:c.desc, self:"", r1:"", r2:"", r3:"" })),
+    overall: { achv:{r1:"",r2:"",r3:""}, improve:{r1:"",r2:"",r3:""} },
+    submitted: { self:false, r1:false, r2:false, r3:false, selfAt:null, r1At:null, r2At:null, r3At:null },
+  };
+}
+
+/* ===================== 상태/유틸 ===================== */
+
+let state = {
+  view:"list", recordId:null, records:{}, loading:true,
+  unlockedRoles:{},        // { [recordId]: Set("self") } — 임원 본인 로그인(레코드별, 세션 한정)
+  globalRoles: new Set(),  // 'hr' | 'lead' | 'r1' | 'r2' — 전역 계정으로 로그인된 역할들 (세션 한정)
+  config:null,             // { roles: {...}, deadlineSelf: "2026-10-16" } — password는 SHA-256 해시
+  gateStep:null,           // 전역 로그인 2단계(사번→비밀번호) 진행 중 임시 상태: { role, empId, needsSetup }
+};
+
+function isPastSelfDeadline(){
+  const d = state.config && state.config.deadlineSelf;
+  if (!d) return false;
+  // 마감일 정오(12:00)까지 작성 허용
+  const deadline = new Date(d + "T12:00:00");
+  return Date.now() > deadline.getTime();
+}
+
+function formatDeadlineKo(dateStr){
+  if (!dateStr) return "";
+  const WD = ["일","월","화","수","목","금","토"];
+  const d = new Date(dateStr + "T12:00:00");
+  if (isNaN(d.getTime())) return "";
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일(${WD[d.getDay()]}) 12:00까지`;
+}
+// unlockedRoles / globalRoles / gateStep은 페이지를 새로고침하면 초기화됩니다 (세션 한정 보호).
+
+async function sha256(text){
+  const enc = new TextEncoder().encode(String(text));
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+function slugId(name){
+  // 문서 ID는 영문/숫자만 사용 (한글 등 비ASCII 문자는 저장소에서 거부될 수 있음)
+  return "exec_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8);
+}
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove("show"), msg && msg.length > 30 ? 5000 : 2200);
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+function isSelfDone(rec){ return !!(rec.submitted && rec.submitted.self); }
+function isR1Done(rec){ return !!(rec.submitted && rec.submitted.r1); }
+function isR2Done(rec){ return !!(rec.submitted && rec.submitted.r2); }
+function isR3Done(rec){ return !!(rec.submitted && rec.submitted.r3); }
+
+// 최종 제출 시 검증 — 비어 있으면 제출 가능, 문자열이 있으면 누락 사유
+function selfMissing(rec){
+  const miss = [];
+  const filledCount = rec.achievements.filter(a => (a.target||a.actual||a.impact)).length;
+  const reqFilled = rec.achievements.filter(a=>a.req).every(a => a.target && a.actual && a.impact);
+  if (!reqFilled) miss.push("자기업적 필수 항목의 목표/실적/주요성과를 모두 입력해 주세요.");
+  if (filledCount < 5) miss.push("자기업적은 최소 5개 항목을 작성해야 합니다. (현재 " + filledCount + "개)");
+  if (!rec.shortfalls) miss.push("부족한 부분을 작성해 주세요.");
+  if (!rec.improvements) miss.push("보완해야 할 사항을 작성해 주세요.");
+  if (!rec.competencies.every(c=>c.self)) miss.push("임원 역량 평가(본인평가)를 모든 항목에 입력해 주세요.");
+  return miss;
+}
+function r1Missing(rec){
+  const miss = [];
+  if (!rec.competencies.every(c=>c.r1)) miss.push("임원 역량 평가(1차평가)를 모든 항목에 입력해 주세요.");
+  if (!rec.overall.achv.r1 || !rec.overall.improve.r1) miss.push("종합 등급 평가(1차평가)를 모두 입력해 주세요.");
+  return miss;
+}
+function r2Missing(rec){
+  const miss = [];
+  if (!rec.competencies.every(c=>c.r2)) miss.push("임원 역량 평가(2차평가)를 모든 항목에 입력해 주세요.");
+  if (!rec.overall.achv.r2 || !rec.overall.improve.r2) miss.push("종합 등급 평가(2차평가)를 모두 입력해 주세요.");
+  return miss;
+}
+function r3Missing(rec){
+  const miss = [];
+  if (!rec.competencies.every(c=>c.r3)) miss.push("임원 역량 평가(3차평가)를 모든 항목에 입력해 주세요.");
+  if (!rec.overall.achv.r3 || !rec.overall.improve.r3) miss.push("종합 등급 평가(3차평가)를 모두 입력해 주세요.");
+  return miss;
+}
+function computeStatus(rec){
+  if (isR2Done(rec)) return { key:"r2_done", label:"2차 평가 완료 · 3차 대기" };
+  if (isR1Done(rec)) return { key:"r1_done", label:"1차 완료 · 2차 평가중" };
+  if (isSelfDone(rec)) return { key:"self_done", label:"본인작성 완료 · 1차 평가중" };
+  return { key:"draft", label:"본인 작성중" };
+}
+
+/* ===================== DB 연동 ===================== */
+
+// Vercel 서버리스 API 래퍼 (claude.ai db 캐퍼빌리티 대체 — 로그인 불필요)
+async function apiGet(path){
+  const res = await fetch(path);
+  if (!res.ok) { const e = new Error("http_" + res.status); e.status = res.status; throw e; }
+  return res.json();
+}
+async function apiSend(path, method, body){
+  const res = await fetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) { const e = new Error("http_" + res.status); e.status = res.status; throw e; }
+  return res.json();
+}
+
+function normalizeRecord(rec){
+  if (!rec.submitted) rec.submitted = { self:false, r1:false, r2:false, r3:false, selfAt:null, r1At:null, r2At:null, r3At:null };
+  if (rec.submitted.r3 === undefined) { rec.submitted.r3 = false; rec.submitted.r3At = null; }
+  if (rec.codes && typeof rec.codes.self === "string") rec.codes.self = { empId: rec.codes.self, password: "" };
+  (rec.competencies||[]).forEach(c => { if (c.r3 === undefined) c.r3 = ""; });
+  if (rec.overall){
+    if (rec.overall.achv && rec.overall.achv.r3 === undefined) rec.overall.achv.r3 = "";
+    if (rec.overall.improve && rec.overall.improve.r3 === undefined) rec.overall.improve.r3 = "";
+  }
+  // 이전 버전 호환: locked 속성이 없으면 처음 5개만 고정(삭제불가)으로 간주
+  (rec.achievements||[]).forEach((a,i) => { if (a.locked === undefined) a.locked = i < 5; });
+  return rec;
+}
+
+let lastLoadError = null;
+
+async function loadAll(){
+  state.loading = true; render();
+  try {
+    const { records } = await apiGet("/api/execs");
+    const recs = {};
+    Object.keys(records || {}).forEach(id => {
+      recs[id] = normalizeRecord(records[id]);
+    });
+    state.records = recs;
+    lastLoadError = null;
+  } catch(e){
+    console.error(e);
+    lastLoadError = (e && e.message) || String(e);
+  }
+  try {
+    const { config } = await apiGet("/api/config");
+    state.config = config || null;
+  } catch(e){ state.config = null; }
+
+  state.loading = false;
+  render();
+}
+
+async function saveConfig(cfg){
+  try { await apiSend("/api/config", "PUT", cfg); state.config = cfg; return true; }
+  catch(e){ console.error(e); toast("설정 저장 중 문제가 발생했습니다: " + (e?.message || String(e))); return false; }
+}
+
+async function saveRecord(id, rec){
+  try {
+    await apiSend("/api/execs/" + encodeURIComponent(id), "PUT", rec);
+    state.records[id] = rec;
+    return true;
+  } catch(e){
+    console.error(e);
+    toast("저장 중 문제가 발생했습니다: " + (e?.message || String(e)));
+    return false;
+  }
+}
+
+async function deleteRecord(id){
+  try { await apiSend("/api/execs/" + encodeURIComponent(id), "DELETE"); } catch(e){ console.error(e); }
+  delete state.records[id];
+  render();
+}
+
+/* ===================== 렌더링 ===================== */
+
+function render(){
+  const app = document.getElementById("app");
+  if (state.loading){ app.innerHTML = '<div class="empty-state">불러오는 중…</div>'; return; }
+  const hasAccess = state.globalRoles.size > 0 || isUnlocked(state.recordId, "self");
+  if (state.view === "list"){
+    app.innerHTML = state.globalRoles.size ? renderList() : renderGate();
+  } else if (state.view === "settings"){
+    app.innerHTML = isAdminRole() ? renderSettings() : (state.globalRoles.size ? renderList() : renderGate());
+  } else {
+    app.innerHTML = hasAccess ? renderDetail(state.recordId) : renderGate();
+  }
+  updateNav();
+  attachHandlers();
+}
+
+function updateNav(){
+  const nav = document.getElementById("topnav");
+  if (!state.globalRoles.size){ nav.innerHTML = ``; return; }
+  const admin = isAdminRole();
+  nav.innerHTML = `<button data-v="list" class="${state.view==='list'?'active':''}">목록</button>
+       ${admin ? `<button data-v="settings" class="${state.view==='settings'?'active':''}">⚙ 설정</button>` : ''}
+       <button data-v="logout" style="background:rgba(255,255,255,.08);">로그아웃</button>`;
+}
+
+function renderGate(){
+  const roles = (state.config && state.config.roles) || {};
+  const hasConfig = ["hr","lead"].every(r => roles[r] && roles[r].empId);
+
+  if (!hasConfig){
+    return `
+      <div class="card" style="max-width:440px; margin:60px auto; padding:28px;">
+        <h2 style="margin-bottom:8px;">최초 설정</h2>
+        <p class="note" style="margin-bottom:18px;">인사팀 담당자와 팀장의 사번을 아이디로 등록해 주세요. 비밀번호는 각자 처음 로그인할 때 본인이 직접 설정합니다. 1차·2차 평가자는 설정 완료 후 "⚙ 설정" 페이지에서 등록합니다.</p>
+        <div class="field"><label>인사팀 담당자 사번</label><input type="text" id="g-hr" placeholder="사번 입력" /></div>
+        <div class="field"><label>팀장 사번</label><input type="text" id="g-lead" placeholder="사번 입력" /></div>
+        <div class="field"><label>본인(피평가자) 작성 마감일</label><input type="date" id="g-deadline" value="2026-10-16" /></div>
+        <button class="btn btn-primary" id="g-setup-ok" style="width:100%; justify-content:center;">설정 완료</button>
+      </div>`;
+  }
+
+  // 2단계: 아이디(사번) 확인 전
+  if (!state.gateStep){
+    return `
+      <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+        <div style="font-size:28px; margin-bottom:6px;">🔒</div>
+        <h2 style="margin-bottom:6px;">아이디(사번)를 입력해 주세요</h2>
+        <p class="note" style="margin-bottom:18px;">피평가자 본인 / 인사팀 / 팀장 / 1차 평가자 / 2차 평가자 — 본인에게 등록된 사번을 입력하면 다음 단계로 진행합니다.</p>
+        <input type="text" id="g-empid" placeholder="사번 입력" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; text-align:center; margin-bottom:12px;" />
+        <button class="btn btn-primary" id="g-id-ok" style="width:100%; justify-content:center;">다음</button>
+        <p class="note" id="g-err" style="color:#b3261e; margin-top:10px; display:none;">등록된 사번이 아닙니다.</p>
+      </div>`;
+  }
+
+  // 2단계: 비밀번호 설정/확인
+  const roleNameMap = { hr:"인사팀", lead:"팀장", r1:"1차 평가자", r2:"2차 평가자" };
+  const { role, empId, needsSetup, recordId } = state.gateStep;
+  const personLabel = role === "self"
+    ? `${escapeHtml(state.records[recordId]?.name || "피평가자")} 본인 (사번 ${escapeHtml(empId)})`
+    : `${roleNameMap[role]} (사번 ${escapeHtml(empId)})`;
+  if (needsSetup){
+    return `
+      <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+        <div style="font-size:28px; margin-bottom:6px;">🆕</div>
+        <h2 style="margin-bottom:4px;">${personLabel}</h2>
+        <p class="note" style="margin-bottom:18px;">처음 로그인하셨네요. 앞으로 사용하실 비밀번호를 설정해 주세요.</p>
+        <input type="password" id="g-pw1" placeholder="새 비밀번호" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:10px;" />
+        <input type="password" id="g-pw2" placeholder="새 비밀번호 확인" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:12px;" />
+        <button class="btn btn-primary" id="g-pw-setup-ok" style="width:100%; justify-content:center;">비밀번호 설정하고 입장</button>
+        <button class="linklike" id="g-back" style="margin-top:10px;">← 뒤로</button>
+        <p class="note" id="g-err" style="color:#b3261e; margin-top:10px; display:none;"></p>
+      </div>`;
+  }
+  return `
+    <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+      <div style="font-size:28px; margin-bottom:6px;">🔒</div>
+      <h2 style="margin-bottom:4px;">${personLabel}</h2>
+      <p class="note" style="margin-bottom:18px;">비밀번호를 입력해 주세요.</p>
+      <input type="password" id="g-pw" placeholder="비밀번호" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; text-align:center; margin-bottom:12px;" />
+      <button class="btn btn-primary" id="g-pw-ok" style="width:100%; justify-content:center;">입장</button>
+      <button class="linklike" id="g-back" style="margin-top:10px; display:block; width:100%;">← 뒤로</button>
+      <p class="note" id="g-err" style="color:#b3261e; margin-top:10px; display:none;">비밀번호가 일치하지 않습니다.</p>
+    </div>`;
+}
+
+function doneBadge(done){
+  return done
+    ? `<span class="status-chip status-self_done">완료</span>`
+    : `<span class="status-chip status-draft">미완료</span>`;
+}
+
+const TITLE_RANK = { "전무":0, "상무":1, "이사":2 };
+function titleRank(title){
+  const t = (title||"").trim();
+  return TITLE_RANK[t] !== undefined ? TITLE_RANK[t] : 99;
+}
+
+function renderList(){
+  const errBanner = lastLoadError
+    ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e; margin-bottom:14px;">⚠ 데이터를 불러오는 중 문제가 발생했습니다 (${escapeHtml(String(lastLoadError))}). 새로고침해도 계속되면 같은 계정/브라우저로 접속했는지 확인해 주세요.</div>`
+    : "";
+  const admin = isAdminRole();
+  const ids = Object.keys(state.records).sort((idA,idB)=>{
+    const a = state.records[idA], b = state.records[idB];
+    const posA = a.position === "sales" ? 0 : 1, posB = b.position === "sales" ? 0 : 1;
+    if (posA !== posB) return posA - posB;
+    const deptCmp = (a.dept||"").localeCompare(b.dept||"", "ko");
+    if (deptCmp !== 0) return deptCmp;
+    const titleCmp = titleRank(a.title) - titleRank(b.title);
+    if (titleCmp !== 0) return titleCmp;
+    return (a.name||"").localeCompare(b.name||"", "ko");
+  });
+  const rows = ids.map(id=>{
+    const r = state.records[id];
+    const posTag = r.position === "sales" ? '<span class="pos-tag pos-sales">영업직</span>' : '<span class="pos-tag pos-nonsales">비영업직</span>';
+    return `<tr data-open="${id}">
+      <td><b>${escapeHtml(r.name)}</b></td>
+      <td>${escapeHtml(r.dept||"")}</td>
+      <td>${escapeHtml(r.title||"")}</td>
+      <td>${posTag}</td>
+      <td>${doneBadge(isSelfDone(r))}</td>
+      <td>${doneBadge(isR1Done(r))}</td>
+      <td>${doneBadge(isR2Done(r))}</td>
+      <td>${doneBadge(isR3Done(r))}</td>
+      <td style="text-align:right; white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" data-open="${id}">열기</button>
+        ${admin ? `<button class="btn btn-ghost btn-sm" data-codes="${id}">코드 보기</button>` : ''}
+        ${admin ? `<button class="btn btn-danger btn-sm" data-del="${id}">삭제</button>` : ''}
+      </td>
+    </tr>`;
+  }).join("");
+
+  const tableOrEmpty = ids.length ? `
+    <div class="table-wrap">
+      <table class="list">
+        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>` : `
+    <div class="card empty-state">
+      <div class="big">등록된 임원이 없습니다</div>
+      ${admin ? "아래 '+ 임원 추가' 버튼으로 평가 대상을 등록해 주세요." : "인사팀에 문의해 주세요."}
+    </div>`;
+
+  const roleNameMap = { hr:"인사팀", lead:"팀장", r1:"1차 평가자", r2:"2차 평가자" };
+  const loggedInAs = [...state.globalRoles].map(r=>roleNameMap[r]).join(", ");
+
+  return `
+    ${errBanner}
+    <div class="hero">
+      <div><h1>임원 인사평가 현황</h1><p>본인 작성 → 1차 평가 → 2차 평가까지 온라인으로 진행합니다. 3차(최종) 평가는 인쇄물로 진행해 주세요. (${escapeHtml(loggedInAs)}(으)로 접속 중)</p></div>
+      <div class="actions-row">
+        ${admin ? `<button class="btn btn-ghost" id="btn-bulk-add">📤 엑셀로 일괄 추가</button>` : ''}
+        ${admin ? `<button class="btn btn-primary" id="btn-add">+ 임원 추가</button>` : ''}
+      </div>
+    </div>
+    ${tableOrEmpty}
+  `;
+}
+
+function renderSettings(){
+  const isAdmin = state.globalRoles.has("hr") || state.globalRoles.has("lead");
+  const ids = Object.keys(state.records).sort((a,b)=> (state.records[a].createdAt||0) - (state.records[b].createdAt||0));
+  const deadline = (state.config && state.config.deadlineSelf) || "";
+
+  const infoRows = ids.map(id=>{
+    const r = state.records[id];
+    const posLabel = r.position === "sales" ? "영업직" : "비영업직";
+    return `<tr>
+      <td><b>${escapeHtml(r.name)}</b></td>
+      <td>${escapeHtml(r.dept||"")}</td>
+      <td>${escapeHtml(r.title||"")}</td>
+      <td>${posLabel}</td>
+      <td>${escapeHtml(r.codes?.self?.empId||"")}</td>
+      <td>${r.codes?.self?.password ? '설정됨' : '미설정'}</td>
+      <td>${doneBadge(isSelfDone(r))}</td>
+      <td>${doneBadge(isR1Done(r))}</td>
+      <td>${doneBadge(isR2Done(r))}</td>
+      <td>${doneBadge(isR3Done(r))}</td>
+    </tr>`;
+  }).join("");
+
+  const infoTableOrEmpty = ids.length ? `
+    <div class="table-wrap">
+      <table class="list">
+        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th><th>비밀번호</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
+        <tbody>${infoRows}</tbody>
+      </table>
+    </div>` : `<div class="card empty-state">등록된 임원이 없습니다.</div>`;
+
+  return `
+    <div class="hero">
+      <div><h1>⚙ 설정</h1><p>작성 기간 및 전체 피평가자 현황을 관리합니다.</p></div>
+      <div class="actions-row">
+        <button class="btn btn-ghost" id="btn-change-code">관리자 코드 관리</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding:18px 20px; margin-bottom:20px; max-width:480px;">
+      <h2 style="border:none; padding:0; margin-bottom:10px;">본인(피평가자) 작성 기간</h2>
+      <p class="note" style="margin-bottom:12px;">이 날짜 자정까지만 본인 작성 칸이 활성화됩니다. 이후에는 자동으로 잠깁니다.</p>
+      ${isAdmin ? `
+        <div class="field"><input type="date" id="st-deadline" value="${escapeHtml(deadline)}" /></div>
+        <button class="btn btn-primary" id="st-deadline-save">저장</button>
+      ` : `<p><b>${escapeHtml(deadline) || "설정되지 않음"}</b></p>`}
+      ${isPastSelfDeadline() ? '<p class="note strong" style="margin-top:10px;">⚠ 현재 마감일이 지나 본인 작성이 잠겨 있습니다.</p>' : ''}
+    </div>
+
+    <h2 style="margin-bottom:10px;">전체 피평가자 정보</h2>
+    ${infoTableOrEmpty}
+  `;
+}
+
+function isUnlocked(recordId, role){
+  // 'self'는 레코드별 코드, r1/r2/hr/lead는 전역 코드
+  if (role === "self") return !!(state.unlockedRoles[recordId] && state.unlockedRoles[recordId].has("self"));
+  return state.globalRoles.has(role);
+}
+function unlockRole(recordId, role){
+  if (role === "self"){
+    if (!state.unlockedRoles[recordId]) state.unlockedRoles[recordId] = new Set();
+    state.unlockedRoles[recordId].add("self");
+  } else {
+    state.globalRoles.add(role);
+  }
+}
+// allowed: ["self"] | ["r1"] | ["r2"] 등. r2는 추가로 해당 레코드의 1차 평가가 완료된 경우에만 활성화.
+function isAdminRole(){
+  return state.globalRoles.has("hr") || state.globalRoles.has("lead");
+}
+
+function fieldDisabled(recordId, allowed){
+  const rec = state.records[recordId];
+  if (!rec) return "disabled";
+  // 인사팀/팀장은 본인·1차·2차·3차 모든 영역을 제한 없이 작성 가능
+  if (isAdminRole() && allowed.some(r=>["self","r1","r2","r3"].includes(r))) return "";
+  const ok = allowed.some(r=>{
+    if (r === "self") return isUnlocked(recordId,"self") && !isSelfDone(rec) && !isPastSelfDeadline();
+    if (r === "r1") return isUnlocked(recordId,"r1") && !isR1Done(rec);
+    if (r === "r2") return isUnlocked(recordId,"r2") && isR1Done(rec) && !isR2Done(rec);
+    if (r === "r3") return isAdminRole() && isR2Done(rec) && !isR3Done(rec);
+    return isUnlocked(recordId, r);
+  });
+  return ok ? "" : "disabled";
+}
+
+function renderDetail(id){
+  const rec = state.records[id];
+  if (!rec) return `<div class="empty-state">기록을 찾을 수 없습니다. <button class="linklike" id="back-list">목록으로</button></div>`;
+  const st = computeStatus(rec);
+  const tpl = TEMPLATES[rec.position];
+
+  // 본인(피평가자) 코드로만 들어온 경우에만 1차/2차 내용을 숨김.
+  // 1차/2차 평가자, 인사팀, 팀장(전역 코드 로그인)은 전체 공개.
+  const selfOnlyMode = isUnlocked(id,"self") && state.globalRoles.size === 0;
+  const mask = (html) => selfOnlyMode ? `<span style="color:var(--text-dim); font-size:12px;">🔒 비공개</span>` : html;
+  const r1DoneForThis = isR1Done(rec);
+  const r2GateNote = state.globalRoles.has("r2") && !r1DoneForThis;
+  const r3GateNote = (state.globalRoles.has("hr") || state.globalRoles.has("lead")) && !isR2Done(rec) && !isR3Done(rec);
+
+  const achvCanEdit = !fieldDisabled(id,["self"]);
+  const achvCards = rec.achievements.map((a,i)=>`
+    <div class="achv-card ${a.req?'required':'example'}">
+      <div class="achv-card-head">
+        <div class="achv-no">${i+1}</div>
+        ${a.req ? '<span class="req-tag">필수</span>' : '<span class="ex-tag">예시</span>'}
+        ${a.req
+            ? `<input class="label-input" value="${escapeHtml(a.label)}" disabled />`
+            : `<input class="label-input" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="예시 항목 — 자유롭게 수정 가능"/>`}
+        ${(!a.locked && achvCanEdit) ? `<button class="btn btn-ghost btn-sm" data-ach-del="${i}" title="항목 삭제">🗑</button>` : ''}
+      </div>
+      <div class="achv-card-body">
+        <div class="achv-grid3">
+          <div class="achv-field"><label>전년 실적</label><input type="text" data-ach="${i}" data-f="prev" value="${escapeHtml(a.prev)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
+          <div class="achv-field"><label>2026 목표</label><input type="text" data-ach="${i}" data-f="target" value="${escapeHtml(a.target)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
+          <div class="achv-field"><label>2026 실적</label><input type="text" data-ach="${i}" data-f="actual" value="${escapeHtml(a.actual)}" ${fieldDisabled(id,["self"])} placeholder="-"/></div>
+        </div>
+        <div class="achv-impact">
+          <label>주요성과 및 경영효과</label>
+          <textarea data-ach="${i}" data-f="impact" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.impact)}</textarea>
+        </div>
+      </div>
+    </div>`).join("");
+
+  const gradeOptions = (val, disabled, cls) => `<select class="grade-sel ${cls||''}" ${disabled} data-grade-val>
+      <option value="" ${!val?'selected':''}>-</option>
+      ${GRADE_DEF.map(g=>`<option value="${g.g}" ${val===g.g?'selected':''}>${g.g}</option>`).join("")}
+    </select>`;
+
+  const compRows = rec.competencies.map((c,i)=>`
+    <tr>
+      <td class="label-cell"><b>${escapeHtml(c.label)}</b></td>
+      <td class="label-cell" style="color:var(--text-dim); font-size:12px;">${escapeHtml(c.desc)}</td>
+      <td class="col-grade" data-comp="${i}" data-f="self">${gradeOptions(c.self, fieldDisabled(id,["self"]))}</td>
+      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r1"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r1, fieldDisabled(id,["r1"]), "ev")}</td>
+      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r2"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r2, fieldDisabled(id,["r2"]), "ev")}</td>
+      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r3"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+    </tr>`).join("");
+
+  const gradeRefRows = `
+    <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
+    <tr><th>기준</th>${GRADE_DEF.map(g=>`<td>${g.label}</td>`).join("")}</tr>
+    <tr><th>점수</th>${GRADE_DEF.map(g=>`<td>${g.score}</td>`).join("")}</tr>`;
+
+  return `
+    <div class="back-row screen-only">
+      <button class="linklike" id="back-list">← 목록으로</button>
+    </div>
+    <div class="formhead screen-only">
+      <div class="idblock">
+        <h1>${escapeHtml(rec.name)} <span style="color:var(--text-dim); font-weight:600; font-size:15px;">· ${tpl.label}</span></h1>
+        <div class="meta-row">
+          <span><b>소속</b> ${escapeHtml(rec.dept||"-")}</span>
+          <span><b>직위</b> ${escapeHtml(rec.title||"-")}</span>
+          <span><b>평가기간</b> ${escapeHtml(rec.evalPeriod)}</span>
+          <span class="status-chip status-${st.key}">${st.label}</span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+        <div class="actions-row">
+          ${isAdminRole() ? '<button class="btn btn-ghost" id="btn-print">🖶 3차 평가자용 인쇄</button>' : ''}
+          ${isAdminRole() ? '<button class="btn btn-ghost" id="btn-edit-exec">정보 수정</button>' : ''}
+          ${isAdminRole() ? '<button class="btn btn-danger" id="btn-del">삭제</button>' : ''}
+        </div>
+      </div>
+    </div>
+
+    ${state.config?.deadlineSelf ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(state.config.deadlineSelf))}</div>` : ''}
+
+    <div class="note strong screen-only">${
+      selfOnlyMode
+        ? `본인(피평가자)으로 로그인됨 — 본인 작성 칸만 수정할 수 있고, 1차·2차·3차 평가 내용은 비공개입니다.`
+        : `'${[...state.globalRoles].map(r=>({hr:"인사팀",lead:"팀장",r1:"1차 평가자",r2:"2차 평가자"}[r])).join(", ")}' 권한으로 전체 내용을 보고 있습니다.`
+    }</div>
+    ${r2GateNote ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 1차 평가가 아직 완료되지 않아 2차 평가란은 작성하실 수 없습니다. 1차 평가 완료 후 다시 시도해 주세요.</div>` : ''}
+    ${selfOnlyMode && isPastSelfDeadline() && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(state.config?.deadlineSelf||'')})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
+    ${r3GateNote ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
+
+    <div class="section">
+      <h2><span class="num">1</span>자기업적 (수치화 가능한 성과)</h2>
+      <p class="note">${tpl.guide}</p>
+      <div class="achv-cards">${achvCards}</div>
+      ${achvCanEdit ? `<button class="btn btn-ghost" id="btn-achv-add" style="margin-top:14px;">+ 항목 추가</button>` : ''}
+      <div class="card" style="margin-top:16px; padding:14px 18px; background:var(--gray-bg); box-shadow:none;">
+        <p style="font-weight:700; font-size:13px; margin-bottom:8px;">💡 참고 예시 항목</p>
+        <p class="note" style="margin-bottom:8px;">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
+        <ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-dim); line-height:1.9;">
+          ${referenceExamples(rec.position).map(a=>`<li>${escapeHtml(a.label)}</li>`).join("")}
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">2</span>부족한 부분</h2>
+      <p class="note">2026년 활동을 기준으로, 목표 대비 미흡했던 부분·기대에 미치지 못한 영역을 구체적으로 기술</p>
+      <textarea class="wide" id="f-shortfalls" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.shortfalls)}</textarea>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">3</span>보완해야 할 사항</h2>
+      <p class="note">부족한 부분을 개선하기 위해 향후 취해야 할 구체적 행동/계획</p>
+      <textarea class="wide" id="f-improvements" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.improvements)}</textarea>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">4</span>임원 역량 평가</h2>
+      <p class="note">정량 실적 외 임원으로서의 역량·리더십을 평가합니다.</p>
+      <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
+      <table class="grade-ref">${gradeRefRows}</table>
+      <div class="legend-row">
+        <div class="legend-chip me"><span class="sw"></span>본인평가 — 참고용</div>
+        <div class="legend-chip ev"><span class="sw"></span>1차·2차 평가 — 참고용 (3차가 최종 결정)</div>
+      </div>
+      <div class="table-wrap" style="border:none;">
+        <table class="form-tbl">
+          <thead><tr><th>평가 항목</th><th>세부 평가 내용</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th></tr></thead>
+          <tbody>${compRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="num">5</span>종합 등급 평가</h2>
+      <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
+      <table class="form-tbl" style="width:100%;">
+        <thead><tr><th>평가 영역</th><th>1차평가</th><th>2차평가</th><th>3차평가</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="label-cell"><b>자기업적 달성도</b></td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r1"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r1, fieldDisabled(id,["r1"]), "ev")}</td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r2"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r2, fieldDisabled(id,["r2"]), "ev")}</td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r3"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+          </tr>
+          <tr>
+            <td class="label-cell"><b>부족한 부분·보완 이행 가능성</b></td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r1"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r1, fieldDisabled(id,["r1"]), "ev")}</td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r2"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r2, fieldDisabled(id,["r2"]), "ev")}</td>
+            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r3"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section screen-only">
+      <h2><span class="num">6</span>최종 종합등급 산출</h2>
+      <p class="note">아래는 최종 등급이 어떻게 산출되는지 보여주는 참고용 안내이며, 3차 평가자가 인쇄물에서 최종 확정합니다.</p>
+      <div class="formula-box">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
+      <table class="grade-ref">
+        <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
+        <tr><th>점수 구간</th><td>95↑</td><td>85~94</td><td>75~84</td><td>65~74</td><td>65 미만</td></tr>
+      </table>
+    </div>
+
+    ${renderSubmitBar(rec, id, selfOnlyMode)}
+
+    ${isAdminRole() ? renderPrintSheet(rec, tpl) : ''}
+  `;
+}
+
+function renderSubmitBar(rec, id, selfOnlyMode){
+  const selfEditable = isUnlocked(id,"self") && !isSelfDone(rec) && !isPastSelfDeadline();
+  const r1Editable = isUnlocked(id,"r1") && !isR1Done(rec);
+  const r2Editable = isUnlocked(id,"r2") && isR1Done(rec) && !isR2Done(rec);
+  const r3Editable = (state.globalRoles.has("hr") || state.globalRoles.has("lead")) && isR2Done(rec) && !isR3Done(rec);
+  const isAdmin = state.globalRoles.has("hr") || state.globalRoles.has("lead");
+
+  const parts = [];
+
+  if (selfEditable || r1Editable || r2Editable || r3Editable){
+    const submitBtns = [];
+    if (selfEditable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-self">✅ 본인 최종 제출</button>`);
+    if (r1Editable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-r1">✅ 1차 평가 최종 제출</button>`);
+    if (r2Editable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-r2">✅ 2차 평가 최종 제출</button>`);
+    if (r3Editable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-r3">✅ 3차 평가 입력 완료</button>`);
+    parts.push(`
+      <div class="savebar screen-only">
+        <span class="save-msg" id="save-msg">작성 중간중간 '저장' 버튼을 눌러 저장해 주세요. 다 작성하시면 '최종 제출'을 눌러주세요.</span>
+        <div class="actions-row">
+          <button class="btn btn-ghost" id="btn-save">임시 저장</button>
+          ${submitBtns.join("")}
+        </div>
+      </div>`);
+  }
+
+  const doneChips = [];
+  if (isSelfDone(rec)) doneChips.push(`<span class="status-chip status-self_done">✅ 본인 제출 완료</span>`);
+  if (isR1Done(rec)) doneChips.push(`<span class="status-chip status-r1_done">✅ 1차 평가 제출 완료</span>`);
+  if (isR2Done(rec)) doneChips.push(`<span class="status-chip status-r2_done">✅ 2차 평가 제출 완료</span>`);
+  if (isR3Done(rec)) doneChips.push(`<span class="status-chip status-r2_done">✅ 3차 평가 입력 완료</span>`);
+  if (doneChips.length){
+    parts.push(`<div class="note screen-only" style="display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;">${doneChips.join("")}</div>`);
+  }
+
+  if (isAdmin && (isSelfDone(rec) || isR1Done(rec) || isR2Done(rec) || isR3Done(rec))){
+    const reopenBtns = [];
+    if (isSelfDone(rec)) reopenBtns.push(`<button class="btn btn-ghost btn-sm" data-reopen="self">본인 작성 재오픈</button>`);
+    if (isR1Done(rec)) reopenBtns.push(`<button class="btn btn-ghost btn-sm" data-reopen="r1">1차 평가 재오픈</button>`);
+    if (isR2Done(rec)) reopenBtns.push(`<button class="btn btn-ghost btn-sm" data-reopen="r2">2차 평가 재오픈</button>`);
+    if (isR3Done(rec)) reopenBtns.push(`<button class="btn btn-ghost btn-sm" data-reopen="r3">3차 평가 재오픈</button>`);
+    parts.push(`
+      <div class="card screen-only" style="padding:14px 16px; margin-top:12px;">
+        <p class="note" style="margin-bottom:10px;">제출을 취소하고 다시 작성할 수 있게 하려면 아래 버튼을 눌러주세요 (인사팀/팀장 전용).</p>
+        <div class="actions-row">${reopenBtns.join("")}</div>
+      </div>`);
+  }
+
+  return parts.join("");
+}
+
+function renderPrintSheet(rec, tpl){
+  const achvRows = rec.achievements.map((a,i)=>`
+    <tr>
+      <td style="text-align:center;">${i+1}</td>
+      <td style="text-align:center;">${a.req?'필수':'예시'}</td>
+      <td>${escapeHtml(a.label)}</td>
+      <td>${escapeHtml(a.prev)||'-'}</td>
+      <td>${escapeHtml(a.target)||'-'}</td>
+      <td>${escapeHtml(a.actual)||'-'}</td>
+      <td>${escapeHtml(a.impact)||'-'}</td>
+    </tr>`).join("");
+
+  const compRows = rec.competencies.map(c=>`
+    <tr>
+      <td><b>${escapeHtml(c.label)}</b><br><span style="font-size:10.5px;color:#666;">${escapeHtml(c.desc)}</span></td>
+      <td style="text-align:center;">${c.self||'-'}</td>
+      <td style="text-align:center;">${c.r1||'-'}</td>
+      <td style="text-align:center;">${c.r2||'-'}</td>
+      <td></td>
+    </tr>`).join("");
+
+  return `
+  <div class="print-wrap">
+    <h1 style="text-align:center; margin-bottom:2px;">2026년 임원 인사 평가표</h1>
+    <p style="text-align:center; font-weight:700; margin-top:0;">[${tpl.label}] — 3차(최종) 평가자 검토용</p>
+    <table class="form-tbl" style="margin-bottom:14px;">
+      <tr><th>성명</th><td>${escapeHtml(rec.name)}</td><th>직위</th><td>${escapeHtml(rec.title||'')}</td></tr>
+      <tr><th>소속</th><td>${escapeHtml(rec.dept||'')}</td><th>평가기간</th><td>${escapeHtml(rec.evalPeriod)}</td></tr>
+    </table>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>1. 자기업적</h2>
+      <table class="form-tbl">
+        <thead><tr><th>No</th><th>구분</th><th>평가 항목</th><th>전년실적</th><th>2026목표</th><th>2026실적</th><th>주요성과 및 경영효과</th></tr></thead>
+        <tbody>${achvRows}</tbody>
+      </table>
+    </div>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>2. 부족한 부분</h2>
+      <p>${escapeHtml(rec.shortfalls) || '(작성 내용 없음)'}</p>
+    </div>
+    <div class="section" style="break-inside:avoid;">
+      <h2>3. 보완해야 할 사항</h2>
+      <p>${escapeHtml(rec.improvements) || '(작성 내용 없음)'}</p>
+    </div>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>4. 임원 역량 평가 (본인 / 1차 / 2차 / <u>3차-수기기입</u>)</h2>
+      <table class="form-tbl">
+        <thead><tr><th>평가 항목</th><th>본인</th><th>1차</th><th>2차</th><th>3차(수기)</th></tr></thead>
+        <tbody>${compRows}</tbody>
+      </table>
+    </div>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>5. 종합 등급 평가</h2>
+      <table class="form-tbl">
+        <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차(수기)</th></tr></thead>
+        <tbody>
+          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center;">${rec.overall.achv.r2||'-'}</td><td></td></tr>
+          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center;">${rec.overall.improve.r2||'-'}</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" style="break-inside:avoid;">
+      <h2>6. 최종 종합등급 산출 (3차 평가자 기입)</h2>
+      <div class="formula-box" style="background:#f2f2f2;">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
+      <table class="grade-ref">
+        <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
+        <tr><th>점수 구간</th><td>95↑</td><td>85~94</td><td>75~84</td><td>65~74</td><td>65 미만</td></tr>
+      </table>
+      <table class="form-tbl" style="margin-top:10px;">
+        <tr><th style="width:30%;">최종점수</th><td></td></tr>
+        <tr><th>최종 등급</th><td></td></tr>
+      </table>
+    </div>
+
+    <p style="margin-top:28px;">3차 평가자(최종): ______________________ (서명)</p>
+  </div>`;
+}
+
+/* ===================== 이벤트 바인딩 ===================== */
+
+function attachHandlers(){
+  document.querySelectorAll("#topnav button").forEach(b=>{
+    b.onclick = () => {
+      if (b.dataset.v === "logout"){
+        state.globalRoles = new Set();
+        state.view = "list"; state.recordId = null;
+        render();
+        return;
+      }
+      state.view = b.dataset.v; state.recordId = null; render();
+    };
+  });
+
+  // 로그인 게이트: 최초 설정(사번 등록 + 마감일)
+  document.getElementById("g-setup-ok")?.addEventListener("click", async ()=>{
+    const hr = document.getElementById("g-hr").value.trim();
+    const lead = document.getElementById("g-lead").value.trim();
+    const deadline = document.getElementById("g-deadline").value;
+    if (!hr || !lead){ toast("인사팀/팀장 사번을 모두 입력해 주세요."); return; }
+    const prev = (state.config && state.config.roles) || {};
+    const ok = await saveConfig({ ...(state.config||{}),
+      deadlineSelf: deadline || state.config?.deadlineSelf || "2026-10-16",
+      evaluators: (state.config && state.config.evaluators) || [],
+      roles: {
+        hr:  { empId: hr,   password: prev.hr?.password || "" },
+        lead:{ empId: lead, password: prev.lead?.password || "" },
+      }});
+    if (ok){ toast("설정이 완료되었습니다. 사번으로 로그인해 주세요."); render(); }
+  });
+
+  // 게이트 1단계: 사번 확인 — 전역 역할(인사팀/팀장/1차/2차) 또는 특정 임원의 본인 사번과 매칭
+  document.getElementById("g-id-ok")?.addEventListener("click", ()=>{
+    const empId = document.getElementById("g-empid").value.trim();
+    const roles = (state.config && state.config.roles) || {};
+    const matchKey = Object.keys(roles).find(k => roles[k].empId && roles[k].empId === empId);
+    if (matchKey){
+      state.gateStep = { role: matchKey, empId, needsSetup: !roles[matchKey].password };
+      render();
+      return;
+    }
+    const evaluators = (state.config && state.config.evaluators) || [];
+    const ev = evaluators.find(e => e.empId === empId);
+    if (ev){
+      state.gateStep = { role: ev.role, empId, evalId: ev.id, needsSetup: !ev.password };
+      render();
+      return;
+    }
+    const recId = Object.keys(state.records).find(id => state.records[id].codes?.self?.empId === empId);
+    if (recId){
+      state.gateStep = { role: "self", empId, recordId: recId, needsSetup: !state.records[recId].codes.self.password };
+      render();
+      return;
+    }
+    document.getElementById("g-err").style.display = "block";
+  });
+  document.getElementById("g-back")?.addEventListener("click", ()=>{ state.gateStep = null; render(); });
+
+  // 게이트 2단계: 최초 비밀번호 설정
+  document.getElementById("g-pw-setup-ok")?.addEventListener("click", async ()=>{
+    const pw1 = document.getElementById("g-pw1").value;
+    const pw2 = document.getElementById("g-pw2").value;
+    const err = document.getElementById("g-err");
+    if (!pw1 || pw1.length < 4){ err.textContent = "비밀번호는 4자 이상 입력해 주세요."; err.style.display="block"; return; }
+    if (pw1 !== pw2){ err.textContent = "비밀번호가 서로 다릅니다."; err.style.display="block"; return; }
+    const { role, recordId, evalId } = state.gateStep;
+    const hash = await sha256(pw1);
+    if (role === "self"){
+      const rec = state.records[recordId];
+      rec.codes.self.password = hash;
+      const ok = await saveRecord(recordId, rec);
+      if (ok){
+        unlockRole(recordId, "self");
+        state.gateStep = null;
+        state.view = "detail"; state.recordId = recordId;
+        toast("비밀번호가 설정되었습니다.");
+        render();
+      }
+      return;
+    }
+    if (evalId){
+      const evaluators = (state.config.evaluators || []).map(e => e.id === evalId ? { ...e, password: hash } : e);
+      const ok = await saveConfig({ ...(state.config||{}), evaluators });
+      if (ok){
+        state.globalRoles.add(role);
+        state.gateStep = null;
+        toast("비밀번호가 설정되었습니다.");
+        render();
+      }
+      return;
+    }
+    const roles = { ...(state.config.roles) };
+    roles[role] = { ...roles[role], password: hash };
+    const ok = await saveConfig({ ...(state.config||{}), roles });
+    if (ok){
+      state.globalRoles.add(role);
+      state.gateStep = null;
+      toast("비밀번호가 설정되었습니다.");
+      render();
+    }
+  });
+
+  // 게이트 2단계: 비밀번호 확인
+  document.getElementById("g-pw-ok")?.addEventListener("click", async ()=>{
+    const pw = document.getElementById("g-pw").value;
+    const { role, recordId, evalId } = state.gateStep;
+    const hash = await sha256(pw);
+    if (role === "self"){
+      const rec = state.records[recordId];
+      if (rec.codes?.self?.password === hash){
+        unlockRole(recordId, "self");
+        state.gateStep = null;
+        state.view = "detail"; state.recordId = recordId;
+        toast("본인 확인되었습니다.");
+        render();
+      } else {
+        document.getElementById("g-err").style.display = "block";
+      }
+      return;
+    }
+    if (evalId){
+      const ev = (state.config.evaluators || []).find(e => e.id === evalId);
+      if (ev && ev.password === hash){
+        state.globalRoles.add(role);
+        state.gateStep = null;
+        toast("로그인되었습니다.");
+        render();
+      } else {
+        document.getElementById("g-err").style.display = "block";
+      }
+      return;
+    }
+    const roles = (state.config && state.config.roles) || {};
+    if (roles[role] && roles[role].password === hash){
+      state.globalRoles.add(role);
+      state.gateStep = null;
+      toast("로그인되었습니다.");
+      render();
+    } else {
+      document.getElementById("g-err").style.display = "block";
+    }
+  });
+
+  if (state.view === "list"){
+    document.getElementById("btn-add")?.addEventListener("click", openAddModal);
+    document.getElementById("btn-bulk-add")?.addEventListener("click", openBulkUploadModal);
+    document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
+    document.querySelectorAll("[data-open]").forEach(el=>{
+      el.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const id = el.getAttribute("data-open");
+        state.view = "detail"; state.recordId = id;
+        render();
+      });
+    });
+    document.querySelectorAll("[data-codes]").forEach(el=>{
+      el.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        openCodesModal(el.getAttribute("data-codes"));
+      });
+    });
+    document.querySelectorAll("[data-del]").forEach(el=>{
+      el.addEventListener("click", async (e)=>{
+        e.stopPropagation();
+        const id = el.getAttribute("data-del");
+        const rec = state.records[id];
+        if (confirm(`'${rec.name}'의 평가 기록을 삭제할까요? 되돌릴 수 없습니다.`)){
+          await deleteRecord(id);
+          toast("삭제되었습니다.");
+        }
+      });
+    });
+    document.querySelectorAll("table.list tbody tr").forEach(tr=>{
+      tr.style.cursor = "pointer";
+      tr.addEventListener("click", ()=>{
+        const id = tr.getAttribute("data-open");
+        state.view = "detail"; state.recordId = id;
+        render();
+      });
+    });
+    return;
+  }
+
+  if (state.view === "settings"){
+    document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
+    document.getElementById("st-deadline-save")?.addEventListener("click", async ()=>{
+      const val = document.getElementById("st-deadline").value;
+      if (!val){ toast("날짜를 선택해 주세요."); return; }
+      const ok = await saveConfig({ ...(state.config||{}), deadlineSelf: val });
+      if (ok){ toast("작성 기간이 저장되었습니다."); render(); }
+    });
+    return;
+  }
+
+  // detail view
+  document.getElementById("back-list")?.addEventListener("click", ()=>{ state.view="list"; render(); });
+  document.getElementById("btn-del")?.addEventListener("click", async ()=>{
+    const rec = state.records[state.recordId];
+    if (confirm(`'${rec.name}'의 평가 기록을 삭제할까요? 되돌릴 수 없습니다.`)){
+      await deleteRecord(state.recordId);
+      state.view = "list"; render();
+      toast("삭제되었습니다.");
+    }
+  });
+  document.getElementById("btn-print")?.addEventListener("click", ()=> window.print());
+  document.getElementById("btn-edit-exec")?.addEventListener("click", ()=> openEditExecModal(state.recordId));
+
+  const rec = state.records[state.recordId];
+  let dirty = false;
+
+  document.querySelectorAll("[data-ach]").forEach(el=>{
+    el.addEventListener("input", ()=>{
+      const i = +el.getAttribute("data-ach"); const f = el.getAttribute("data-f");
+      rec.achievements[i][f] = el.value; dirty = true; markDirty();
+    });
+  });
+  document.getElementById("btn-achv-add")?.addEventListener("click", async ()=>{
+    rec.achievements.push({ label:"", req:false, prev:"", target:"", actual:"", impact:"", locked:false });
+    const ok = await saveRecord(state.recordId, rec);
+    if (ok) render();
+  });
+  document.querySelectorAll("[data-ach-del]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const i = +btn.getAttribute("data-ach-del");
+      if (!confirm("이 항목을 삭제할까요?")) return;
+      rec.achievements.splice(i, 1);
+      const ok = await saveRecord(state.recordId, rec);
+      if (ok) render();
+    });
+  });
+  document.getElementById("f-shortfalls")?.addEventListener("input", (e)=>{ rec.shortfalls = e.target.value; dirty=true; markDirty(); });
+  document.getElementById("f-improvements")?.addEventListener("input", (e)=>{ rec.improvements = e.target.value; dirty=true; markDirty(); });
+
+  document.querySelectorAll("[data-comp]").forEach(cell=>{
+    const sel = cell.querySelector("select");
+    sel?.addEventListener("change", ()=>{
+      const i = +cell.getAttribute("data-comp"); const f = cell.getAttribute("data-f");
+      rec.competencies[i][f] = sel.value; dirty = true; markDirty();
+    });
+  });
+  document.querySelectorAll("[data-overall]").forEach(cell=>{
+    const sel = cell.querySelector("select");
+    sel?.addEventListener("change", ()=>{
+      const key = cell.getAttribute("data-overall"); const f = cell.getAttribute("data-f");
+      rec.overall[key][f] = sel.value; dirty = true; markDirty();
+    });
+  });
+
+  document.getElementById("btn-save")?.addEventListener("click", async ()=>{
+    await doSave(true);
+  });
+
+  document.getElementById("btn-submit-self")?.addEventListener("click", async ()=>{
+    const miss = selfMissing(rec);
+    if (miss.length){ alert("아직 제출할 수 없습니다:\n\n- " + miss.join("\n- ")); return; }
+    if (!confirm("본인 작성 내용을 최종 제출할까요? 제출 후에는 인사팀/팀장만 재오픈할 수 있습니다.")) return;
+    rec.submitted.self = true; rec.submitted.selfAt = Date.now();
+    const ok = await saveRecord(state.recordId, rec);
+    if (ok){ toast("제출이 완료되었습니다."); render(); }
+  });
+  document.getElementById("btn-submit-r1")?.addEventListener("click", async ()=>{
+    const miss = r1Missing(rec);
+    if (miss.length){ alert("아직 제출할 수 없습니다:\n\n- " + miss.join("\n- ")); return; }
+    if (!confirm("1차 평가를 최종 제출할까요? 제출 후에는 인사팀/팀장만 재오픈할 수 있습니다.")) return;
+    rec.submitted.r1 = true; rec.submitted.r1At = Date.now();
+    const ok = await saveRecord(state.recordId, rec);
+    if (ok){ toast("1차 평가가 제출되었습니다."); render(); }
+  });
+  document.getElementById("btn-submit-r2")?.addEventListener("click", async ()=>{
+    const miss = r2Missing(rec);
+    if (miss.length){ alert("아직 제출할 수 없습니다:\n\n- " + miss.join("\n- ")); return; }
+    if (!confirm("2차 평가를 최종 제출할까요? 제출 후에는 인사팀/팀장만 재오픈할 수 있습니다.")) return;
+    rec.submitted.r2 = true; rec.submitted.r2At = Date.now();
+    const ok = await saveRecord(state.recordId, rec);
+    if (ok){ toast("2차 평가가 제출되었습니다."); render(); }
+  });
+  document.getElementById("btn-submit-r3")?.addEventListener("click", async ()=>{
+    const miss = r3Missing(rec);
+    if (miss.length){ alert("아직 입력을 완료할 수 없습니다:\n\n- " + miss.join("\n- ")); return; }
+    if (!confirm("3차 평가 내용을 입력 완료 처리할까요?")) return;
+    rec.submitted.r3 = true; rec.submitted.r3At = Date.now();
+    const ok = await saveRecord(state.recordId, rec);
+    if (ok){ toast("3차 평가 입력이 완료되었습니다."); render(); }
+  });
+  document.querySelectorAll("[data-reopen]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const key = btn.getAttribute("data-reopen");
+      const label = { self:"본인 작성", r1:"1차 평가", r2:"2차 평가", r3:"3차 평가" }[key];
+      if (!confirm(`${label}을 재오픈할까요? 제출이 취소되고 다시 작성할 수 있게 됩니다.`)) return;
+      rec.submitted[key] = false; rec.submitted[key+"At"] = null;
+      const ok = await saveRecord(state.recordId, rec);
+      if (ok){ toast(`${label}이 재오픈되었습니다.`); render(); }
+    });
+  });
+
+  function markDirty(){
+    const msg = document.getElementById("save-msg");
+    if (msg){ msg.textContent = "⚠ 저장되지 않은 변경사항이 있습니다 — '저장' 버튼을 눌러주세요."; msg.classList.remove("ok"); }
+  }
+  async function doSave(manual){
+    const ok = await saveRecord(state.recordId, rec);
+    const msg = document.getElementById("save-msg");
+    if (ok){
+      if (msg){ msg.textContent = "✓ 저장되었습니다"; msg.classList.add("ok"); }
+      if (manual) toast("저장되었습니다.");
+      // re-render list status lazily (not forcing full rerender to keep focus)
+    }
+  }
+}
+
+function openCodesModal(recordId){
+  const rec = state.records[recordId];
+  const hasPw = !!rec.codes?.self?.password;
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>'${escapeHtml(rec.name)}' 접속 정보</h3>
+      <p class="note" style="margin-bottom:14px;">공통 접속 링크(아무 화면이나 접속 URL)와 아래 사번을 본인에게 전달해 주세요. 비밀번호는 최초 로그인 시 본인이 직접 설정합니다.</p>
+      <div class="field"><label>본인(피평가자) 사번</label><input type="text" id="cm-code" value="${escapeHtml(rec.codes?.self?.empId||"")}" /></div>
+      <div class="field">
+        <label>비밀번호 상태</label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="status-chip ${hasPw?'status-self_done':'status-draft'}">${hasPw?'설정됨':'미설정(최초 로그인 대기)'}</span>
+          ${hasPw ? '<button class="btn btn-ghost btn-sm" id="cm-reset-pw">비밀번호 초기화</button>' : ''}
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cm-close">닫기</button>
+        <button class="btn btn-primary" id="cm-save">사번 저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#cm-close").onclick = ()=> wrap.remove();
+  wrap.querySelector("#cm-reset-pw")?.addEventListener("click", async ()=>{
+    if (!confirm("비밀번호를 초기화할까요? 본인이 다음 로그인 시 새 비밀번호를 설정하게 됩니다.")) return;
+    rec.codes.self.password = "";
+    const ok = await saveRecord(recordId, rec);
+    if (ok){ toast("비밀번호가 초기화되었습니다."); wrap.remove(); openCodesModal(recordId); }
+  });
+  wrap.querySelector("#cm-save").onclick = async ()=>{
+    const newCode = wrap.querySelector("#cm-code").value.trim();
+    if (!newCode){ toast("사번을 입력해 주세요."); return; }
+    rec.codes = { self: { empId:newCode, password: rec.codes?.self?.password || "" } };
+    const ok = await saveRecord(recordId, rec);
+    if (ok){ toast("사번이 저장되었습니다."); wrap.remove(); }
+  };
+}
+
+function openAdminCodesModal(){
+  const roles = (state.config && state.config.roles) || {};
+  const evaluators = (state.config && state.config.evaluators) || [];
+
+  const roleRow = (key, label) => {
+    const r = roles[key] || {};
+    const hasPw = !!r.password;
+    return `
+      <div class="field">
+        <label>${label} 사번</label>
+        <input type="text" id="ac-${key}" value="${escapeHtml(r.empId||"")}" />
+        <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+          <span class="status-chip ${hasPw?'status-self_done':'status-draft'}">${hasPw?'비밀번호 설정됨':'비밀번호 미설정'}</span>
+          ${hasPw ? `<button class="btn btn-ghost btn-sm" data-reset-pw="${key}">비밀번호 초기화</button>` : ''}
+        </div>
+      </div>`;
+  };
+
+  const evalRows = evaluators.map(ev=>{
+    const hasPw = !!ev.password;
+    const label = ev.role === "r1" ? "1차 평가자" : "2차 평가자";
+    return `<tr>
+      <td><span class="status-chip ${ev.role==='r1'?'status-r1_done':'status-r2_done'}">${label}</span></td>
+      <td>${escapeHtml(ev.empId)}</td>
+      <td><span class="status-chip ${hasPw?'status-self_done':'status-draft'}">${hasPw?'설정됨':'미설정'}</span></td>
+      <td style="text-align:right; white-space:nowrap;">
+        ${hasPw ? `<button class="btn btn-ghost btn-sm" data-ev-reset="${ev.id}">비번 초기화</button>` : ''}
+        <button class="btn btn-danger btn-sm" data-ev-del="${ev.id}">삭제</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal" style="max-width:560px;">
+      <h3>관리자 코드 관리</h3>
+      <p class="note" style="margin-bottom:14px;">인사팀·팀장 사번입니다. 비밀번호는 각자 처음 로그인할 때 설정하며, 잊어버린 경우 여기서 초기화할 수 있습니다.</p>
+      ${roleRow("hr","인사팀 담당자")}
+      ${roleRow("lead","팀장")}
+      <div class="modal-actions" style="justify-content:flex-start; margin:10px 0 18px;">
+        <button class="btn btn-primary" id="ac-save">사번 저장</button>
+      </div>
+
+      <h3 style="border-top:1px solid var(--line); padding-top:16px;">1차·2차 평가자 관리</h3>
+      <p class="note" style="margin-bottom:10px;">필요한 만큼 등록/삭제할 수 있습니다. 새로 등록된 평가자도 최초 로그인 시 본인이 비밀번호를 직접 설정합니다.</p>
+      <div class="table-wrap" style="margin-bottom:12px;">
+        <table class="list">
+          <thead><tr><th>구분</th><th>사번</th><th>비밀번호</th><th></th></tr></thead>
+          <tbody id="ac-ev-rows">${evalRows || '<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">등록된 평가자가 없습니다</td></tr>'}</tbody>
+        </table>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+        <div class="field" style="margin-bottom:0; flex:1; min-width:140px;"><label>사번</label><input type="text" id="ac-ev-empid" placeholder="사번 입력" /></div>
+        <div class="field" style="margin-bottom:0;"><label>구분</label>
+          <select id="ac-ev-role">
+            <option value="r1">1차 평가자</option>
+            <option value="r2">2차 평가자</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="ac-ev-add" style="margin-bottom:13px;">+ 추가</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="ac-close">닫기</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#ac-close").onclick = ()=> wrap.remove();
+
+  wrap.querySelectorAll("[data-reset-pw]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const key = btn.getAttribute("data-reset-pw");
+      const label = { hr:"인사팀 담당자", lead:"팀장" }[key];
+      if (!confirm(`${label}의 비밀번호를 초기화할까요? 다음 로그인 시 새 비밀번호를 설정하게 됩니다.`)) return;
+      const newRoles = { ...roles, [key]: { ...roles[key], password: "" } };
+      const ok = await saveConfig({ ...(state.config||{}), roles: newRoles });
+      if (ok){ toast("비밀번호가 초기화되었습니다."); wrap.remove(); openAdminCodesModal(); }
+    });
+  });
+
+  wrap.querySelector("#ac-save").onclick = async ()=>{
+    const hr = wrap.querySelector("#ac-hr").value.trim();
+    const lead = wrap.querySelector("#ac-lead").value.trim();
+    if (!hr || !lead){ toast("인사팀/팀장 사번을 모두 입력해 주세요."); return; }
+    const newRoles = {
+      hr:  { empId: hr,   password: roles.hr?.password || "" },
+      lead:{ empId: lead, password: roles.lead?.password || "" },
+    };
+    const ok = await saveConfig({ ...(state.config||{}), roles: newRoles });
+    if (ok){ toast("사번이 저장되었습니다."); wrap.remove(); }
+  };
+
+  wrap.querySelector("#ac-ev-add").onclick = async ()=>{
+    const empId = wrap.querySelector("#ac-ev-empid").value.trim();
+    const role = wrap.querySelector("#ac-ev-role").value;
+    if (!empId){ toast("사번을 입력해 주세요."); return; }
+    const allEmpIds = [
+      roles.hr?.empId, roles.lead?.empId,
+      ...evaluators.map(e=>e.empId),
+      ...Object.values(state.records).map(r=>r.codes?.self?.empId),
+    ].filter(Boolean);
+    if (allEmpIds.includes(empId)){ toast("이미 사용 중인 사번입니다."); return; }
+    const newEv = { id: "ev_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6), empId, role, password: "" };
+    const ok = await saveConfig({ ...(state.config||{}), evaluators: [...evaluators, newEv] });
+    if (ok){ toast("평가자가 추가되었습니다."); wrap.remove(); openAdminCodesModal(); }
+  };
+
+  wrap.querySelectorAll("[data-ev-del]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const id = btn.getAttribute("data-ev-del");
+      if (!confirm("이 평가자를 삭제할까요? 해당 사번으로는 더 이상 로그인할 수 없게 됩니다.")) return;
+      const newEvaluators = evaluators.filter(e=>e.id !== id);
+      const ok = await saveConfig({ ...(state.config||{}), evaluators: newEvaluators });
+      if (ok){ toast("삭제되었습니다."); wrap.remove(); openAdminCodesModal(); }
+    });
+  });
+  wrap.querySelectorAll("[data-ev-reset]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const id = btn.getAttribute("data-ev-reset");
+      if (!confirm("이 평가자의 비밀번호를 초기화할까요? 다음 로그인 시 새 비밀번호를 설정하게 됩니다.")) return;
+      const newEvaluators = evaluators.map(e => e.id === id ? { ...e, password: "" } : e);
+      const ok = await saveConfig({ ...(state.config||{}), evaluators: newEvaluators });
+      if (ok){ toast("비밀번호가 초기화되었습니다."); wrap.remove(); openAdminCodesModal(); }
+    });
+  });
+}
+
+function openEditExecModal(recordId){
+  const rec = state.records[recordId];
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>피평가자 정보 수정</h3>
+      <div class="field"><label>성명</label><input type="text" id="e-name" value="${escapeHtml(rec.name)}" /></div>
+      <div class="field"><label>소속</label><input type="text" id="e-dept" value="${escapeHtml(rec.dept||"")}" /></div>
+      <div class="field"><label>직위</label><input type="text" id="e-title" value="${escapeHtml(rec.title||"")}" /></div>
+      <div class="field"><label>포지션</label>
+        <select id="e-pos">
+          <option value="sales" ${rec.position==='sales'?'selected':''}>영업직</option>
+          <option value="nonsales" ${rec.position==='nonsales'?'selected':''}>비영업직</option>
+        </select>
+      </div>
+      <p class="note">포지션을 변경해도 이미 작성된 자기업적/역량평가 내용은 그대로 유지됩니다 (새 항목 템플릿은 적용되지 않음).</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="e-cancel">취소</button>
+        <button class="btn btn-primary" id="e-ok">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#e-cancel").onclick = ()=> wrap.remove();
+  wrap.querySelector("#e-ok").onclick = async ()=>{
+    const name = wrap.querySelector("#e-name").value.trim();
+    if (!name){ toast("성명을 입력해 주세요."); return; }
+    rec.name = name;
+    rec.dept = wrap.querySelector("#e-dept").value.trim();
+    rec.title = wrap.querySelector("#e-title").value.trim();
+    rec.position = wrap.querySelector("#e-pos").value;
+    const ok = await saveRecord(recordId, rec);
+    if (ok){ toast("정보가 저장되었습니다."); wrap.remove(); render(); }
+  };
+}
+
+function openAddModal(){
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>임원 추가</h3>
+      <div class="field"><label>성명</label><input type="text" id="m-name" placeholder="예: 홍길동" /></div>
+      <div class="field"><label>소속</label><input type="text" id="m-dept" placeholder="예: 영업본부" /></div>
+      <div class="field"><label>직위</label><input type="text" id="m-title" placeholder="예: 상무" /></div>
+      <div class="field"><label>포지션</label>
+        <select id="m-pos">
+          <option value="sales">영업직</option>
+          <option value="nonsales">비영업직</option>
+        </select>
+      </div>
+      <div class="field"><label>본인(피평가자) 사번 코드</label><input type="text" id="m-code" placeholder="예: 사번 뒷자리 등 본인에게 전달할 코드" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="m-cancel">취소</button>
+        <button class="btn btn-primary" id="m-ok">추가</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#m-cancel").onclick = ()=> wrap.remove();
+  wrap.querySelector("#m-ok").onclick = async ()=>{
+    const name = wrap.querySelector("#m-name").value.trim();
+    if (!name){ toast("성명을 입력해 주세요."); return; }
+    const dept = wrap.querySelector("#m-dept").value.trim();
+    const title = wrap.querySelector("#m-title").value.trim();
+    const pos = wrap.querySelector("#m-pos").value;
+    const code = wrap.querySelector("#m-code").value.trim();
+    if (!code){ toast("본인 사번 코드를 입력해 주세요."); return; }
+    const id = slugId(name);
+    const rec = newRecord(name, dept, title, pos, code);
+    wrap.querySelector("#m-ok").innerHTML = '<span class="spinner"></span>';
+    const ok = await saveRecord(id, rec);
+    wrap.remove();
+    if (ok){
+      toast(`'${name}' 임원이 추가되었습니다.`);
+      render();
+    }
+  };
+}
+
+function openBulkUploadModal(){
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal" style="max-width:600px;">
+      <h3>📤 엑셀로 일괄 추가</h3>
+      <p class="note" style="margin-bottom:12px;">첫 행은 머리글로 두고, 아래 5개 열로 구성된 .xlsx 파일을 올려주세요.</p>
+      <table class="grade-ref" style="margin-bottom:14px;">
+        <tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th></tr>
+        <tr><td>홍길동</td><td>영업본부</td><td>상무</td><td>영업직</td><td>10234</td></tr>
+      </table>
+      <p class="note" style="margin-bottom:10px;">포지션 칸에는 "영업직" 또는 "비영업직"만 입력해 주세요.</p>
+      <input type="file" id="bu-file" accept=".xlsx,.xls" />
+      <div id="bu-preview" style="margin-top:14px;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="bu-cancel">닫기</button>
+        <button class="btn btn-primary" id="bu-confirm" style="display:none;">일괄 추가</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#bu-cancel").onclick = ()=> wrap.remove();
+
+  let parsedRows = [];
+
+  wrap.querySelector("#bu-file").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try {
+        const data = new Uint8Array(ev.target.result);
+        const wb = XLSX.read(data, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        const existingEmpIds = new Set(Object.values(state.records).map(r=>r.codes?.self?.empId).filter(Boolean));
+        const seenEmpIds = new Set();
+        parsedRows = rows.map(r=>{
+          const name = String(r["성명"]||"").trim();
+          const dept = String(r["소속"]||"").trim();
+          const title = String(r["직위"]||"").trim();
+          const posRaw = String(r["포지션"]||"").trim();
+          const empId = String(r["사번"]||"").trim();
+          const position = posRaw === "영업직" ? "sales" : posRaw === "비영업직" ? "nonsales" : null;
+          let issue = "";
+          if (!name) issue = "성명 누락";
+          else if (!empId) issue = "사번 누락";
+          else if (!position) issue = "포지션 값 오류(영업직/비영업직만 가능)";
+          else if (existingEmpIds.has(empId) || seenEmpIds.has(empId)) issue = "사번 중복";
+          if (!issue && empId) seenEmpIds.add(empId);
+          return { name, dept, title, position, posRaw, empId, issue };
+        });
+        renderPreview();
+      } catch(err){
+        console.error(err);
+        wrap.querySelector("#bu-preview").innerHTML = `<p class="note strong">파일을 읽을 수 없습니다. .xlsx 형식인지 확인해 주세요.</p>`;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function renderPreview(){
+    const ok = parsedRows.filter(r=>!r.issue);
+    const bad = parsedRows.filter(r=>r.issue);
+    const rowsHtml = parsedRows.map(r=>`
+      <tr>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${escapeHtml(r.dept)}</td>
+        <td>${escapeHtml(r.title)}</td>
+        <td>${escapeHtml(r.posRaw)}</td>
+        <td>${escapeHtml(r.empId)}</td>
+        <td>${r.issue ? `<span class="status-chip status-draft">⚠ ${escapeHtml(r.issue)}</span>` : `<span class="status-chip status-self_done">✓ 추가 가능</span>`}</td>
+      </tr>`).join("");
+    wrap.querySelector("#bu-preview").innerHTML = `
+      <div class="table-wrap" style="max-height:260px; overflow-y:auto;">
+        <table class="list">
+          <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th><th>상태</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+      <p class="note" style="margin-top:10px;">총 ${parsedRows.length}건 중 <b>${ok.length}건 추가 가능</b>, ${bad.length}건 제외됩니다.</p>`;
+    wrap.querySelector("#bu-confirm").style.display = ok.length ? "" : "none";
+  }
+
+  wrap.querySelector("#bu-confirm").onclick = async ()=>{
+    const ok = parsedRows.filter(r=>!r.issue);
+    if (!ok.length) return;
+    const btn = wrap.querySelector("#bu-confirm");
+    btn.innerHTML = '<span class="spinner"></span>';
+    let success = 0;
+    for (const r of ok){
+      const id = slugId(r.name);
+      const rec = newRecord(r.name, r.dept, r.title, r.position, r.empId);
+      const saved = await saveRecord(id, rec);
+      if (saved) success++;
+    }
+    wrap.remove();
+    toast(`${success}명이 추가되었습니다.`);
+    render();
+  };
+}
+
+/* ===================== 초기화 ===================== */
+
+loadAll();
+
+})();
+</script>
+</body>
+</html>
