@@ -33,13 +33,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
-    --green: #22361c; --green-ink: #bfe3ab; --orange: #3a2414; --orange-ink: #f2c49c;
+    --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
   }
 }
 :root[data-theme="dark"] {
   --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
-  --green: #22361c; --green-ink: #bfe3ab; --orange: #3a2414; --orange-ink: #f2c49c;
+  --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
 }
 * { box-sizing: border-box; }
@@ -102,7 +102,8 @@ table.list th {
   text-align: left; padding: 12px 14px; background: var(--navy); color: #fff; font-weight: 700;
   font-size: 12.5px; white-space: nowrap;
 }
-table.list td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: middle; }
+table.list td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+table.list th { white-space: nowrap; }
 table.list tr:hover td { background: #fafbfd; }
 .pos-tag { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space:nowrap; }
 .pos-sales { background: #EAF2FF; color: #1d4ed8; }
@@ -398,6 +399,7 @@ function newRecord(name, dept, title, position, empId) {
   return {
     name, dept, title, position,
     evalPeriod: "2026.01.01 ~ 평가일",
+    deadlineOverride: "", // 비어있으면 전체 공통 마감일 적용, 값이 있으면 이 사람만 그 날짜 적용
     createdAt: Date.now(),
     codes: { self: { empId: String(empId||"").trim(), password: "" } },
     achievements: starterAchievements(position).map(a => ({ label: a.req ? a.label : "", req:a.req, prev:"", target:"", actual:"", impact:"", locked:true })),
@@ -421,8 +423,12 @@ let state = {
 
 let selectedForDelete = new Set(); // 목록 화면 일괄삭제 체크박스 선택 상태 (세션 한정)
 
-function isPastSelfDeadline(){
-  const d = state.config && state.config.deadlineSelf;
+// rec을 넘기면 그 임원의 개별 연장 마감일(deadlineOverride)을 우선 적용, 없으면 전체 공통 마감일 사용
+function effectiveDeadline(rec){
+  return (rec && rec.deadlineOverride) || (state.config && state.config.deadlineSelf) || "";
+}
+function isPastSelfDeadline(rec){
+  const d = effectiveDeadline(rec);
   if (!d) return false;
   // 마감일 정오(12:00)까지 작성 허용
   const deadline = new Date(d + "T12:00:00");
@@ -538,6 +544,7 @@ function normalizeRecord(rec){
   }
   // 이전 버전 호환: locked 속성이 없으면 처음 5개만 고정(삭제불가)으로 간주
   (rec.achievements||[]).forEach((a,i) => { if (a.locked === undefined) a.locked = i < 5; });
+  if (rec.deadlineOverride === undefined) rec.deadlineOverride = "";
   return rec;
 }
 
@@ -655,8 +662,9 @@ function renderGate(){
       <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
         <div style="font-size:28px; margin-bottom:6px;">🆕</div>
         <h2 style="margin-bottom:4px;">${personLabel}</h2>
-        <p class="note" style="margin-bottom:18px;">처음 로그인하셨네요. 앞으로 사용하실 비밀번호를 설정해 주세요.</p>
-        <input type="password" id="g-pw1" placeholder="새 비밀번호" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:10px;" />
+        <p class="note" style="margin-bottom:10px;">처음 로그인하셨네요. 앞으로 사용하실 비밀번호를 설정해 주세요.</p>
+        <p class="note" style="margin-bottom:14px; color:#2448b0;">※ 비밀번호는 4자 이상이면 됩니다 (문자 종류 제한 없음)</p>
+        <input type="password" id="g-pw1" placeholder="새 비밀번호 (4자 이상)" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:10px;" />
         <input type="password" id="g-pw2" placeholder="새 비밀번호 확인" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:12px;" />
         <button class="btn btn-primary" id="g-pw-setup-ok" style="width:100%; justify-content:center;">비밀번호 설정하고 입장</button>
         <button class="linklike" id="g-back" style="margin-top:10px;">← 뒤로</button>
@@ -778,13 +786,14 @@ function renderSettings(){
       <td>${doneBadge(isR1Done(r))}</td>
       <td>${doneBadge(isR2Done(r))}</td>
       <td>${doneBadge(isR3Done(r))}</td>
+      <td>${r.deadlineOverride ? `<span class="status-chip status-r1_done">연장 ${escapeHtml(r.deadlineOverride)}</span>` : '<span style="color:var(--text-dim); font-size:12px;">공통</span>'}</td>
     </tr>`;
   }).join("");
 
   const infoTableOrEmpty = ids.length ? `
     <div class="table-wrap">
       <table class="list">
-        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th><th>비밀번호</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
+        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th><th>비밀번호</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th><th>마감일</th></tr></thead>
         <tbody>${infoRows}</tbody>
       </table>
     </div>` : `<div class="card empty-state">등록된 임원이 없습니다.</div>`;
@@ -836,7 +845,7 @@ function fieldDisabled(recordId, allowed){
   // 인사팀/팀장은 본인·1차·2차·3차 모든 영역을 제한 없이 작성 가능
   if (isAdminRole() && allowed.some(r=>["self","r1","r2","r3"].includes(r))) return "";
   const ok = allowed.some(r=>{
-    if (r === "self") return isUnlocked(recordId,"self") && !isSelfDone(rec) && !isPastSelfDeadline();
+    if (r === "self") return isUnlocked(recordId,"self") && !isSelfDone(rec) && !isPastSelfDeadline(rec);
     if (r === "r1") return isUnlocked(recordId,"r1") && !isR1Done(rec);
     if (r === "r2") return isUnlocked(recordId,"r2") && isR1Done(rec) && !isR2Done(rec);
     if (r === "r3") return isAdminRole() && isR2Done(rec) && !isR3Done(rec);
@@ -928,7 +937,7 @@ function renderDetail(id){
       </div>
     </div>
 
-    ${state.config?.deadlineSelf ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(state.config.deadlineSelf))}</div>` : ''}
+    ${effectiveDeadline(rec) ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(effectiveDeadline(rec)))}${rec.deadlineOverride ? ' (이 분만 개별 연장됨)' : ''}</div>` : ''}
 
     <div class="note strong screen-only">${
       selfOnlyMode
@@ -936,7 +945,7 @@ function renderDetail(id){
         : `'${[...state.globalRoles].map(r=>({hr:"인사팀",lead:"팀장",r1:"1차 평가자",r2:"2차 평가자"}[r])).join(", ")}' 권한으로 전체 내용을 보고 있습니다.`
     }</div>
     ${r2GateNote ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 1차 평가가 아직 완료되지 않아 2차 평가란은 작성하실 수 없습니다. 1차 평가 완료 후 다시 시도해 주세요.</div>` : ''}
-    ${selfOnlyMode && isPastSelfDeadline() && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(state.config?.deadlineSelf||'')})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
+    ${selfOnlyMode && isPastSelfDeadline(rec) && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(effectiveDeadline(rec))})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
     ${r3GateNote ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
 
     <div class="section screen-only">
@@ -1019,7 +1028,7 @@ function renderDetail(id){
 }
 
 function renderSubmitBar(rec, id, selfOnlyMode){
-  const selfEditable = isUnlocked(id,"self") && !isSelfDone(rec) && !isPastSelfDeadline();
+  const selfEditable = isUnlocked(id,"self") && !isSelfDone(rec) && !isPastSelfDeadline(rec);
   const r1Editable = isUnlocked(id,"r1") && !isR1Done(rec);
   const r2Editable = isUnlocked(id,"r2") && isR1Done(rec) && !isR2Done(rec);
   const r3Editable = (state.globalRoles.has("hr") || state.globalRoles.has("lead")) && isR2Done(rec) && !isR3Done(rec);
@@ -1685,6 +1694,14 @@ function openEditExecModal(recordId){
         </select>
       </div>
       <p class="note">포지션을 변경해도 이미 작성된 자기업적/역량평가 내용은 그대로 유지됩니다 (새 항목 템플릿은 적용되지 않음).</p>
+
+      <div class="field" style="border-top:1px solid var(--line); padding-top:14px;">
+        <label>개별 마감일 연장 (이 사람만)</label>
+        <input type="date" id="e-deadline" value="${escapeHtml(rec.deadlineOverride||"")}" />
+        <p class="note" style="margin-top:6px;">비워두면 전체 공통 마감일(${escapeHtml(formatDeadlineKo(state.config?.deadlineSelf||""))||'미설정'})을 따릅니다. 날짜를 지정하면 이 사람만 그 날짜 정오까지로 연장됩니다.</p>
+        ${rec.deadlineOverride ? `<button class="btn btn-ghost btn-sm" id="e-deadline-clear" style="margin-top:6px;">개별 연장 해제(공통 마감일로 복귀)</button>` : ''}
+      </div>
+
       <div class="modal-actions">
         <button class="btn btn-ghost" id="e-cancel">취소</button>
         <button class="btn btn-primary" id="e-ok">저장</button>
@@ -1693,6 +1710,9 @@ function openEditExecModal(recordId){
   document.body.appendChild(wrap);
   wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
   wrap.querySelector("#e-cancel").onclick = ()=> wrap.remove();
+  wrap.querySelector("#e-deadline-clear")?.addEventListener("click", ()=>{
+    wrap.querySelector("#e-deadline").value = "";
+  });
   wrap.querySelector("#e-ok").onclick = async ()=>{
     const name = wrap.querySelector("#e-name").value.trim();
     if (!name){ toast("성명을 입력해 주세요."); return; }
@@ -1700,6 +1720,7 @@ function openEditExecModal(recordId){
     rec.dept = wrap.querySelector("#e-dept").value.trim();
     rec.title = wrap.querySelector("#e-title").value.trim();
     rec.position = wrap.querySelector("#e-pos").value;
+    rec.deadlineOverride = wrap.querySelector("#e-deadline").value || "";
     const ok = await saveRecord(recordId, rec);
     if (ok){ toast("정보가 저장되었습니다."); wrap.remove(); render(); }
   };
