@@ -303,6 +303,10 @@ input.role-r3:disabled,   textarea.role-r3:disabled,   select.role-r3:disabled {
 .role-dot.r2 { background: var(--role-r2-dot); }
 .role-dot.r3 { background: var(--role-r3-dot); }
 
+/* 줄 맞춤: 가운데 정렬 카드는 줄 길이를 고르게, 일반 안내문은 마지막 줄에 한두 글자만 남지 않게 */
+.gate-card h2, .gate-card p, .modal h3, .modal p.note { text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
+.note, .role-banner { text-wrap: pretty; }
+
 /* 참고 예시 박스 / 선택 뱃지 (다크모드 대응) */
 .tip-box { margin-top:16px; padding:16px 20px; background:var(--tip-bg); border:1px solid var(--tip-border); border-left:4px solid #E8A33D; box-shadow:none; }
 .tip-box .tip-title { font-weight:800; font-size:14px; margin:0 0 8px; color:var(--tip-title); }
@@ -812,7 +816,7 @@ function renderGate(){
   // 2단계: 아이디(사번) 확인 전
   if (!state.gateStep){
     return `
-      <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+      <div class="card gate-card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
         <div style="font-size:28px; margin-bottom:6px;">🔒</div>
         <h2 style="margin-bottom:18px;">아이디(사번)를 입력해 주세요</h2>
         <input type="text" id="g-empid" placeholder="사번 입력" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; text-align:center; margin-bottom:12px;" />
@@ -829,10 +833,10 @@ function renderGate(){
     : `${roleNameMap[role]} (사번 ${escapeHtml(empId)})`;
   if (needsSetup){
     return `
-      <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+      <div class="card gate-card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
         <div style="font-size:28px; margin-bottom:6px;">🆕</div>
         <h2 style="margin-bottom:4px;">${personLabel}</h2>
-        <p class="note" style="margin-bottom:10px;">처음 로그인하셨네요. 앞으로 사용하실 비밀번호를 설정해 주세요.</p>
+        <p class="note" style="margin-bottom:10px;">처음 로그인하셨네요.<br>앞으로 사용하실 비밀번호를 설정해 주세요.</p>
         <p class="note" style="margin-bottom:14px; color:#2448b0;">※ 비밀번호는 4자 이상이면 됩니다 (문자 종류 제한 없음)</p>
         <input type="password" id="g-pw1" placeholder="새 비밀번호 (4자 이상)" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:10px;" />
         <input type="password" id="g-pw2" placeholder="새 비밀번호 확인" style="width:100%; padding:11px; border:1px solid var(--line); border-radius:8px; font-size:15px; margin-bottom:12px;" />
@@ -842,7 +846,7 @@ function renderGate(){
       </div>`;
   }
   return `
-    <div class="card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
+    <div class="card gate-card" style="max-width:380px; margin:60px auto; padding:28px; text-align:center;">
       <div style="font-size:28px; margin-bottom:6px;">🔒</div>
       <h2 style="margin-bottom:4px;">${personLabel}</h2>
       <p class="note" style="margin-bottom:18px;">비밀번호를 입력해 주세요.</p>
