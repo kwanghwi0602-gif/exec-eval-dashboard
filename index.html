@@ -23,6 +23,10 @@
   --role-r2: #DCEBFA;   --role-r2-ink: #1B4F8A;   --role-r2-dot: #4A90D9;
   --role-r3: #EADCF8;   --role-r3-ink: #4E2A84;   --role-r3-dot: #9B6CD6;
   --locked-bg: #ECEEF1;
+  --navy-text:#1F3864; --note-ink:#4b5563; --heading-line:#1F3864;
+  --info-bg:#eef2ff; --info-ink:#2448b0; --warn-bg:#fdecea; --warn-ink:#b3261e;
+  --tip-bg:#FFF8E6; --tip-border:#F3DE9C; --tip-title:#8A5A00; --tip-ink:#5c4000;
+  --opt-bg:#FFF3D6; --opt-ink:#8A5A00;
   --gray-bg: #F6F7F9;
   --line: #DCE1E8;
   --text: #22282f;
@@ -40,22 +44,30 @@
     --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
     --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
-    --role-self:#1d3b2c; --role-self-ink:#8fe6b3; --role-self-dot:#4caf7a;
-    --role-r1:#442a16; --role-r1-ink:#f2c49c; --role-r1-dot:#e08a4a;
-    --role-r2:#183a5e; --role-r2-ink:#9ccbff; --role-r2-dot:#5aa5f0;
-    --role-r3:#3a2a5a; --role-r3-ink:#cdb4f5; --role-r3-dot:#a67be0;
-    --locked-bg:#262b34;
+    --role-self:#1f5a3c; --role-self-ink:#d4f5e2; --role-self-dot:#4fc98a;
+    --role-r1:#8a4a12;   --role-r1-ink:#ffe6cc;   --role-r1-dot:#ff9a3d;
+    --role-r2:#1c4f86;   --role-r2-ink:#d6e9ff;   --role-r2-dot:#5aa8ff;
+    --role-r3:#523585;   --role-r3-ink:#eadcff;   --role-r3-dot:#b48cff;
+    --locked-bg:#2a2f38;
+  --navy-text:#bcd0ff; --note-ink:#c3cad4; --heading-line:#4a6bb5;
+    --navy-text:#bcd0ff; --note-ink:#c3cad4; --heading-line:#4a6bb5;
+    --info-bg:#1d2a4a; --info-ink:#aec5ff; --warn-bg:#4a1f1c; --warn-ink:#ffb4ab;
+    --tip-bg:#3a3015; --tip-border:#6b5a1f; --tip-title:#ffd88a; --tip-ink:#f3e3bd;
+    --opt-bg:#4a3a14; --opt-ink:#ffd88a;
   }
 }
 :root[data-theme="dark"] {
   --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
   --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
-  --role-self:#1d3b2c; --role-self-ink:#8fe6b3; --role-self-dot:#4caf7a;
-  --role-r1:#442a16; --role-r1-ink:#f2c49c; --role-r1-dot:#e08a4a;
-  --role-r2:#183a5e; --role-r2-ink:#9ccbff; --role-r2-dot:#5aa5f0;
-  --role-r3:#3a2a5a; --role-r3-ink:#cdb4f5; --role-r3-dot:#a67be0;
-  --locked-bg:#262b34;
+  --role-self:#1f5a3c; --role-self-ink:#d4f5e2; --role-self-dot:#4fc98a;
+  --role-r1:#8a4a12;   --role-r1-ink:#ffe6cc;   --role-r1-dot:#ff9a3d;
+  --role-r2:#1c4f86;   --role-r2-ink:#d6e9ff;   --role-r2-dot:#5aa8ff;
+  --role-r3:#523585;   --role-r3-ink:#eadcff;   --role-r3-dot:#b48cff;
+  --locked-bg:#2a2f38;
+  --info-bg:#1d2a4a; --info-ink:#aec5ff; --warn-bg:#4a1f1c; --warn-ink:#ffb4ab;
+  --tip-bg:#3a3015; --tip-border:#6b5a1f; --tip-title:#ffd88a; --tip-ink:#f3e3bd;
+  --opt-bg:#4a3a14; --opt-ink:#ffd88a;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -101,7 +113,7 @@ h2 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--navy); color: #fff; }
 .btn-primary:hover { background: var(--navy-deep); }
-.btn-ghost { background: var(--white); color: var(--navy); border: 1px solid var(--line); }
+.btn-ghost { background: var(--white); color: var(--navy-text); border: 1px solid var(--line); }
 .btn-ghost:hover { background: var(--gray-bg); }
 .btn-danger { background: #fff; color: #b3261e; border: 1px solid #f3c9c5; }
 .btn-danger:hover { background: #fff5f4; }
@@ -153,7 +165,7 @@ table.list tr:hover td { background: #fafbfd; }
 
 /* ---- detail/form view ---- */
 .back-row { display:flex; align-items:center; gap: 10px; margin-bottom: 6px; }
-.linklike { background:none; border:none; color: var(--navy); font-weight:700; font-size: 13.5px; cursor:pointer; padding: 4px 0; }
+.linklike { background:none; border:none; color: var(--navy-text); font-weight:700; font-size: 13.5px; cursor:pointer; padding: 4px 0; }
 .formhead {
   display:flex; flex-wrap:wrap; gap: 14px 24px; align-items:flex-start; justify-content:space-between;
   margin: 6px 0 20px;
@@ -173,10 +185,12 @@ table.list tr:hover td { background: #fafbfd; }
   background: var(--white); border:1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
   padding: 20px 22px; margin-bottom: 18px;
 }
-.section h2 { display:flex; align-items:center; gap:9px; color: var(--navy); padding-bottom: 10px; border-bottom: 2px solid var(--navy); margin-bottom: 12px;}
+.section h2 { display:flex; align-items:center; gap:9px; color: var(--navy-text); padding-bottom: 10px; border-bottom: 2px solid var(--heading-line); margin-bottom: 12px;}
 .section h2 .num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:var(--navy); color:#fff; font-size:12px; }
-.note { word-break: keep-all; overflow-wrap: anywhere; font-size: 13.5px; color: #4b5563; font-style: normal; font-weight: 500; margin: 0 0 12px; line-height:1.6; }
+.note { word-break: keep-all; overflow-wrap: anywhere; font-size: 13.5px; color: var(--note-ink); font-style: normal; font-weight: 500; margin: 0 0 12px; line-height:1.6; }
 .note.strong { color: var(--orange-ink); font-weight:700; font-style:normal; background: var(--orange); padding:8px 11px; border-radius:7px; }
+.note.strong.info { background: var(--info-bg); color: var(--info-ink); }
+.note.strong.warn { background: var(--warn-bg); color: var(--warn-ink); }
 
 .legend-row { display:flex; gap: 10px; margin-bottom: 18px; flex-wrap:wrap; }
 .legend-chip { flex:1; min-width: 220px; padding: 9px 13px; border-radius: 8px; font-size: 12.5px; font-weight:700; display:flex; align-items:center; gap:7px; }
@@ -215,7 +229,7 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
 .grade-ref th, .grade-ref td { border:1px solid var(--line); padding:6px; text-align:center; }
 .grade-ref th { background: var(--gray-bg); font-weight:700; width: 70px;}
 
-.formula-box { background: var(--gray-bg); border:1px solid var(--line); border-radius:8px; padding: 12px 14px; font-size: 13.5px; font-weight:700; color: var(--navy); margin-bottom:12px; }
+.formula-box { background: var(--gray-bg); border:1px solid var(--line); border-radius:8px; padding: 12px 14px; font-size: 13.5px; font-weight:700; color: var(--navy-text); margin-bottom:12px; }
 
 .savebar {
   position: sticky; bottom: env(safe-area-inset-bottom, 0px); margin-top: 10px;
@@ -261,6 +275,10 @@ input.role-self, textarea.role-self, select.role-self { background: var(--role-s
 input.role-r1,   textarea.role-r1,   select.role-r1   { background: var(--role-r1); }
 input.role-r2,   textarea.role-r2,   select.role-r2   { background: var(--role-r2); }
 input.role-r3,   textarea.role-r3,   select.role-r3   { background: var(--role-r3); }
+input.role-self:not(:disabled), textarea.role-self:not(:disabled), select.role-self:not(:disabled) { border-color: var(--role-self-dot); }
+input.role-r1:not(:disabled),   textarea.role-r1:not(:disabled),   select.role-r1:not(:disabled)   { border-color: var(--role-r1-dot); }
+input.role-r2:not(:disabled),   textarea.role-r2:not(:disabled),   select.role-r2:not(:disabled)   { border-color: var(--role-r2-dot); }
+input.role-r3:not(:disabled),   textarea.role-r3:not(:disabled),   select.role-r3:not(:disabled)   { border-color: var(--role-r3-dot); }
 select.grade-sel.role-self:not(:disabled) { color: var(--role-self-ink); }
 select.grade-sel.role-r1:not(:disabled)   { color: var(--role-r1-ink); }
 select.grade-sel.role-r2:not(:disabled)   { color: var(--role-r2-ink); }
@@ -275,7 +293,7 @@ input.role-r3:disabled,   textarea.role-r3:disabled,   select.role-r3:disabled {
   background: var(--locked-bg); color: var(--text); -webkit-text-fill-color: var(--text); cursor: not-allowed; opacity: 1;
 }
 /* 예시 항목명 입력칸(작성 가능할 때만 칸 모양으로 표시) */
-.achv-card-head .label-input.role-self:not(:disabled) { background: var(--role-self); border:1px solid var(--line); border-radius:8px; padding:9px 11px; }
+.achv-card-head .label-input.role-self:not(:disabled) { background: var(--role-self); border:1px solid var(--role-self-dot); border-radius:8px; padding:9px 11px; }
 .achv-card-head .label-input.role-self:not(:disabled):focus { background: var(--role-self); outline:2px solid var(--role-self-dot); }
 
 /* 표 머리글/라벨의 역할 색 점 */
@@ -284,6 +302,13 @@ input.role-r3:disabled,   textarea.role-r3:disabled,   select.role-r3:disabled {
 .role-dot.r1 { background: var(--role-r1-dot); }
 .role-dot.r2 { background: var(--role-r2-dot); }
 .role-dot.r3 { background: var(--role-r3-dot); }
+
+/* 참고 예시 박스 / 선택 뱃지 (다크모드 대응) */
+.tip-box { margin-top:16px; padding:16px 20px; background:var(--tip-bg); border:1px solid var(--tip-border); border-left:4px solid #E8A33D; box-shadow:none; }
+.tip-box .tip-title { font-weight:800; font-size:14px; margin:0 0 8px; color:var(--tip-title); }
+.tip-box .tip-sub { margin:0 0 10px; font-size:13px; color:var(--tip-title); }
+.tip-box ul { margin:0; padding-left:20px; font-size:13.5px; color:var(--tip-ink); line-height:2.1; font-weight:500; }
+.opt-badge { font-size:12px; font-weight:700; color:var(--opt-ink); background:var(--opt-bg); padding:3px 9px; border-radius:999px; margin-left:4px; }
 
 /* 로그인한 역할 안내 배너 */
 .role-banner { word-break: keep-all; overflow-wrap: anywhere; padding:12px 14px; border-radius:10px; background: var(--gray-bg); border:1px solid var(--line); font-size:14px; font-weight:600; margin-bottom:14px; line-height:2; }
@@ -842,7 +867,7 @@ function titleRank(title){
 
 function renderList(){
   const errBanner = lastLoadError
-    ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e; margin-bottom:14px;">⚠ 데이터를 불러오는 중 문제가 발생했습니다 (${escapeHtml(String(lastLoadError))}). 새로고침해도 계속되면 같은 계정/브라우저로 접속했는지 확인해 주세요.</div>`
+    ? `<div class="note strong warn screen-only" style="margin-bottom:14px;">⚠ 데이터를 불러오는 중 문제가 발생했습니다 (${escapeHtml(String(lastLoadError))}). 새로고침해도 계속되면 같은 계정/브라우저로 접속했는지 확인해 주세요.</div>`
     : "";
   const admin = isAdminRole();
   const ids = Object.keys(state.records).sort((idA,idB)=>{
@@ -1109,22 +1134,22 @@ function renderDetail(id){
       </div>
     </div>
 
-    ${effectiveDeadline(rec) ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(effectiveDeadline(rec)))}${rec.deadlineOverride ? ' (이 분만 개별 연장됨)' : ''}</div>` : ''}
+    ${effectiveDeadline(rec) ? `<div class="note strong info screen-only">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(effectiveDeadline(rec)))}${rec.deadlineOverride ? ' (이 분만 개별 연장됨)' : ''}</div>` : ''}
 
     ${roleBannerHtml}
-    ${r2GateNote ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 1차 평가가 아직 완료되지 않아 2차 평가란은 작성하실 수 없습니다. 1차 평가 완료 후 다시 시도해 주세요.</div>` : ''}
-    ${selfOnlyMode && isPastSelfDeadline(rec) && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(effectiveDeadline(rec))})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
-    ${r3GateNote ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
+    ${r2GateNote ? `<div class="note strong warn screen-only">⚠ 1차 평가가 아직 완료되지 않아 2차 평가란은 작성하실 수 없습니다. 1차 평가 완료 후 다시 시도해 주세요.</div>` : ''}
+    ${selfOnlyMode && isPastSelfDeadline(rec) && !isSelfDone(rec) ? `<div class="note strong warn screen-only">⚠ 본인 작성 기간(${escapeHtml(effectiveDeadline(rec))})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
+    ${r3GateNote ? `<div class="note strong info screen-only">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
 
     <div class="section screen-only">
       <h2><span class="num">1</span>자기업적 (수치화 가능한 성과)</h2>
       <p class="note">${tpl.guide}</p>
       <div class="achv-cards">${achvCards}</div>
       ${achvCanEdit ? `<button class="btn btn-primary" id="btn-achv-add" style="margin-top:14px; padding:12px 22px; font-size:14.5px;">➕ 항목 추가</button>` : ''}
-      <div class="card" style="margin-top:16px; padding:16px 20px; background:#FFF8E6; border:1px solid #F3DE9C; border-left:4px solid #E8A33D; box-shadow:none;">
-        <p style="font-weight:800; font-size:14px; margin-bottom:8px; color:#8A5A00;">💡 참고 예시 항목</p>
-        <p style="margin-bottom:10px; font-size:13px; color:#8A5A00;">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
-        <ul style="margin:0; padding-left:20px; font-size:13.5px; color:#5c4000; line-height:2.1; font-weight:500;">
+      <div class="card tip-box">
+        <p class="tip-title">💡 참고 예시 항목</p>
+        <p class="tip-sub">아래 내용을 참고해서 "+ 항목 추가"로 직접 작성해 보세요.</p>
+        <ul>
           ${referenceExamples(rec.position).map(a=>`<li>${escapeHtml(a.label)}</li>`).join("")}
         </ul>
       </div>
@@ -1186,7 +1211,7 @@ function renderDetail(id){
 
     ${selfOnlyMode ? '' : `
     <div class="section screen-only">
-      <h2><span class="num">6</span>참고 의견 <span style="font-size:12px; font-weight:700; color:#8A5A00; background:#FFF3D6; padding:3px 9px; border-radius:999px; margin-left:4px;">선택 · 필요시만 작성</span></h2>
+      <h2><span class="num">6</span>참고 의견 <span class="opt-badge">선택 · 필요시만 작성</span></h2>
       <p class="note">자유롭게 남기고 싶은 의견이 있을 때만 작성해 주세요. 최종 제출 여부와는 무관합니다.</p>
       <div class="field" style="margin-bottom:18px;">
         <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;"><span class="role-dot r1"></span>1차 평가자 참고 의견</label>
