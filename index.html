@@ -637,20 +637,20 @@ function selfMissing(rec){
 }
 function r1Missing(rec){
   const miss = [];
-  if (!rec.competencies.every(c=>c.r1)) miss.push("임원 역량 평가(1차평가)를 모든 항목에 입력해 주세요.");
   if (!rec.overall.achv.r1 || !rec.overall.improve.r1) miss.push("종합 등급 평가(1차평가)를 모두 입력해 주세요.");
+  if (!rec.competencies.every(c=>c.r1)) miss.push("임원 역량 평가(1차평가)를 모든 항목에 입력해 주세요.");
   return miss;
 }
 function r2Missing(rec){
   const miss = [];
-  if (!rec.competencies.every(c=>c.r2)) miss.push("임원 역량 평가(2차평가)를 모든 항목에 입력해 주세요.");
   if (!rec.overall.achv.r2 || !rec.overall.improve.r2) miss.push("종합 등급 평가(2차평가)를 모두 입력해 주세요.");
+  if (!rec.competencies.every(c=>c.r2)) miss.push("임원 역량 평가(2차평가)를 모든 항목에 입력해 주세요.");
   return miss;
 }
 function r3Missing(rec){
   const miss = [];
-  if (!rec.competencies.every(c=>c.r3)) miss.push("임원 역량 평가(3차평가)를 모든 항목에 입력해 주세요.");
   if (!rec.overall.achv.r3 || !rec.overall.improve.r3) miss.push("종합 등급 평가(3차평가)를 모두 입력해 주세요.");
+  if (!rec.competencies.every(c=>c.r3)) miss.push("임원 역량 평가(3차평가)를 모든 항목에 입력해 주세요.");
   return miss;
 }
 function computeStatus(rec){
@@ -1143,21 +1143,13 @@ function renderDetail(id){
     </div>
 
     <div class="section screen-only">
-      <h2><span class="num">4</span>임원 역량 평가</h2>
-      <p class="note">정량 실적 외 임원으로서의 역량·리더십을 평가합니다.</p>
+      <h2><span class="num">4</span>종합 등급 평가</h2>
+      ${selfOnlyMode ? `
+      <div class="role-banner" style="margin-bottom:0;">🔒 이 항목은 1차·2차 평가자가 작성하는 영역으로, 피평가자에게는 비공개입니다.</div>
+      ` : `
+      <p class="note">1~3번(자기업적·부족한 부분·보완해야 할 사항) 내용을 바탕으로 종합 등급을 평가합니다.</p>
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <table class="grade-ref">${gradeRefRows}</table>
-      <div class="table-wrap" style="border:none;">
-        <table class="form-tbl comp-tbl">
-          <thead><tr><th>평가 항목</th><th>세부 평가 내용</th><th><span class="role-dot self"></span>본인평가</th><th><span class="role-dot r1"></span>1차평가</th><th><span class="role-dot r2"></span>2차평가</th><th><span class="role-dot r3"></span>3차평가</th></tr></thead>
-          <tbody>${compRows}</tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="section screen-only">
-      <h2><span class="num">5</span>종합 등급 평가</h2>
-      <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <div class="table-wrap" style="border:none;">
       <table class="form-tbl comp-tbl" style="width:100%;">
         <thead><tr><th>평가 영역</th><th><span class="role-dot r1"></span>1차평가</th><th><span class="role-dot r2"></span>2차평가</th><th><span class="role-dot r3"></span>3차평가</th></tr></thead>
@@ -1176,6 +1168,19 @@ function renderDetail(id){
           </tr>
         </tbody>
       </table>
+      </div>`}
+    </div>
+
+    <div class="section screen-only">
+      <h2><span class="num">5</span>임원 역량 평가</h2>
+      <p class="note">정량 실적 외 임원으로서의 역량·리더십을 평가합니다.</p>
+      <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
+      <table class="grade-ref">${gradeRefRows}</table>
+      <div class="table-wrap" style="border:none;">
+        <table class="form-tbl comp-tbl">
+          <thead><tr><th>평가 항목</th><th>세부 평가 내용</th><th><span class="role-dot self"></span>본인평가</th><th><span class="role-dot r1"></span>1차평가</th><th><span class="role-dot r2"></span>2차평가</th><th><span class="role-dot r3"></span>3차평가</th></tr></thead>
+          <tbody>${compRows}</tbody>
+        </table>
       </div>
     </div>
 
@@ -1194,9 +1199,9 @@ function renderDetail(id){
     </div>`}
 
     <div class="section screen-only">
-      <h2><span class="num">7</span>최종 종합등급 산출</h2>
+      <h2><span class="num">${selfOnlyMode ? 6 : 7}</span>최종 종합등급 산출</h2>
       <p class="note">아래는 최종 등급이 어떻게 산출되는지 보여주는 참고용 자료입니다.</p>
-      <div class="formula-box">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
+      <div class="formula-box">최종점수 = 4번(종합등급평가) 점수 × 70% + 5번(임원역량평가) 점수 × 30%</div>
       <table class="grade-ref">
         <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
         <tr><th>점수 구간</th><td>95↑</td><td>85~94</td><td>75~84</td><td>65~74</td><td>65 미만</td></tr>
@@ -1334,17 +1339,8 @@ function renderPrintSheet(rec, tpl){
     </div>
 
     <div class="section pc-sec" style="break-inside:avoid;">
-      <h2>4. 임원 역량 평가</h2>
+      <h2>4. 종합 등급 평가</h2>
       ${gradeRef}
-      <table class="form-tbl pc-tbl">
-        <colgroup><col style="width:19%"><col style="width:33%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
-        <thead><tr><th>평가 항목</th><th>세부 평가 내용</th>${th("본인평가","self")}${th("1차평가","r1")}${th("2차평가","r2")}${th("3차평가","r3")}</tr></thead>
-        <tbody>${compRows}</tbody>
-      </table>
-    </div>
-
-    <div class="section pc-sec" style="break-inside:avoid;">
-      <h2>5. 종합 등급 평가</h2>
       <table class="form-tbl pc-tbl">
         <colgroup><col style="width:46%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup>
         <thead><tr><th>평가 영역</th>${th("1차평가","r1")}${th("2차평가","r2")}${th("3차평가","r3")}</tr></thead>
@@ -1352,6 +1348,16 @@ function renderPrintSheet(rec, tpl){
           <tr><td class="pc-lab"><b>자기업적 달성도</b></td><td class="pc-g r1">${t(rec.overall.achv.r1)}</td><td class="pc-g r2">${t(rec.overall.achv.r2)}</td><td class="pc-g r3">${t(rec.overall.achv.r3)}</td></tr>
           <tr><td class="pc-lab"><b>부족한 부분·보완 이행 가능성</b></td><td class="pc-g r1">${t(rec.overall.improve.r1)}</td><td class="pc-g r2">${t(rec.overall.improve.r2)}</td><td class="pc-g r3">${t(rec.overall.improve.r3)}</td></tr>
         </tbody>
+      </table>
+    </div>
+
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>5. 임원 역량 평가</h2>
+      ${gradeRef}
+      <table class="form-tbl pc-tbl">
+        <colgroup><col style="width:19%"><col style="width:33%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
+        <thead><tr><th>평가 항목</th><th>세부 평가 내용</th>${th("본인평가","self")}${th("1차평가","r1")}${th("2차평가","r2")}${th("3차평가","r3")}</tr></thead>
+        <tbody>${compRows}</tbody>
       </table>
     </div>
 
@@ -1365,7 +1371,7 @@ function renderPrintSheet(rec, tpl){
 
     <div class="section pc-sec" style="break-inside:avoid;">
       <h2>7. 최종 종합등급 산출 <span class="pc-opt">(3차 평가자 기입)</span></h2>
-      <div class="formula-box" style="background:#f2f2f2;">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
+      <div class="formula-box" style="background:#f2f2f2;">최종점수 = 4번(종합등급평가) 점수 × 70% + 5번(임원역량평가) 점수 × 30%</div>
       <table class="grade-ref">
         <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
         <tr><th>점수 구간</th><td>95↑</td><td>85~94</td><td>75~84</td><td>65~74</td><td>65 미만</td></tr>
