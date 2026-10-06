@@ -18,6 +18,11 @@
   --orange: #FCE4D6;
   --orange-ink: #833C00;
   --orange-strong: #D98A4C;
+  --role-self: #E2F0D9; --role-self-ink: #375623; --role-self-dot: #6FA85C;
+  --role-r1: #FCE4D6;   --role-r1-ink: #833C00;   --role-r1-dot: #D98A4C;
+  --role-r2: #DCEBFA;   --role-r2-ink: #1B4F8A;   --role-r2-dot: #4A90D9;
+  --role-r3: #EADCF8;   --role-r3-ink: #4E2A84;   --role-r3-dot: #9B6CD6;
+  --locked-bg: #ECEEF1;
   --gray-bg: #F6F7F9;
   --line: #DCE1E8;
   --text: #22282f;
@@ -35,12 +40,22 @@
     --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
     --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+    --role-self:#1d3b2c; --role-self-ink:#8fe6b3; --role-self-dot:#4caf7a;
+    --role-r1:#442a16; --role-r1-ink:#f2c49c; --role-r1-dot:#e08a4a;
+    --role-r2:#183a5e; --role-r2-ink:#9ccbff; --role-r2-dot:#5aa5f0;
+    --role-r3:#3a2a5a; --role-r3-ink:#cdb4f5; --role-r3-dot:#a67be0;
+    --locked-bg:#262b34;
   }
 }
 :root[data-theme="dark"] {
   --gray-bg: #12151a; --white: #1a1e25; --line: #2a303a; --text: #e8eaed; --text-dim: #9aa2ad;
   --green: #1d3b2c; --green-ink: #8fe6b3; --orange: #3a2414; --orange-ink: #f2c49c;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  --role-self:#1d3b2c; --role-self-ink:#8fe6b3; --role-self-dot:#4caf7a;
+  --role-r1:#442a16; --role-r1-ink:#f2c49c; --role-r1-dot:#e08a4a;
+  --role-r2:#183a5e; --role-r2-ink:#9ccbff; --role-r2-dot:#5aa5f0;
+  --role-r3:#3a2a5a; --role-r3-ink:#cdb4f5; --role-r3-dot:#a67be0;
+  --locked-bg:#262b34;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -160,7 +175,7 @@ table.list tr:hover td { background: #fafbfd; }
 }
 .section h2 { display:flex; align-items:center; gap:9px; color: var(--navy); padding-bottom: 10px; border-bottom: 2px solid var(--navy); margin-bottom: 12px;}
 .section h2 .num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:var(--navy); color:#fff; font-size:12px; }
-.note { font-size: 13.5px; color: #4b5563; font-style: normal; font-weight: 500; margin: 0 0 12px; line-height:1.6; }
+.note { word-break: keep-all; overflow-wrap: anywhere; font-size: 13.5px; color: #4b5563; font-style: normal; font-weight: 500; margin: 0 0 12px; line-height:1.6; }
 .note.strong { color: var(--orange-ink); font-weight:700; font-style:normal; background: var(--orange); padding:8px 11px; border-radius:7px; }
 
 .legend-row { display:flex; gap: 10px; margin-bottom: 18px; flex-wrap:wrap; }
@@ -186,14 +201,13 @@ table.form-tbl input[type=text]:focus, table.form-tbl textarea:focus { border-co
 table.form-tbl textarea { resize: vertical; min-height: 56px; }
 select.grade-sel {
   width: 100%; padding: 6px 4px; border-radius: 5px; border:1px solid transparent; font-weight:700; text-align:center;
-  font-size: 13px; background: var(--green); color: var(--green-ink); font-family:inherit;
+  font-size: 13px; color: var(--text); font-family:inherit;
 }
-select.grade-sel.ev { background: var(--orange); color: var(--orange-ink); }
 select.grade-sel:disabled, input:disabled, textarea:disabled { cursor:not-allowed; opacity:1; }
 .col-narrow { width: 118px; }
 .col-grade { width: 90px; }
 
-textarea.wide { width:100%; min-height:220px; border:1px solid var(--line); border-radius:8px; padding:14px 16px; font-size:14.5px; font-family:inherit; background:var(--green); color:var(--text); line-height:1.7; }
+textarea.wide { width:100%; min-height:220px; border:1px solid var(--line); border-radius:8px; padding:14px 16px; font-size:14.5px; font-family:inherit; color:var(--text); line-height:1.7; }
 textarea.wide:focus { outline:2px solid var(--green-strong); }
 textarea.wide:disabled { cursor:not-allowed; opacity:1; }
 
@@ -238,6 +252,49 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
 }
 .print-only { display:none; }
 
+
+/* ---- 역할별 작성칸 색상: 작성 가능한 칸만 역할색, 작성 불가 칸은 회색으로 통일 ---- */
+input.role-self, textarea.role-self, select.role-self { background: var(--role-self); }
+input.role-r1,   textarea.role-r1,   select.role-r1   { background: var(--role-r1); }
+input.role-r2,   textarea.role-r2,   select.role-r2   { background: var(--role-r2); }
+input.role-r3,   textarea.role-r3,   select.role-r3   { background: var(--role-r3); }
+select.grade-sel.role-self:not(:disabled) { color: var(--role-self-ink); }
+select.grade-sel.role-r1:not(:disabled)   { color: var(--role-r1-ink); }
+select.grade-sel.role-r2:not(:disabled)   { color: var(--role-r2-ink); }
+select.grade-sel.role-r3:not(:disabled)   { color: var(--role-r3-ink); }
+textarea.role-r1:focus, select.role-r1:focus { outline:2px solid var(--role-r1-dot); }
+textarea.role-r2:focus, select.role-r2:focus { outline:2px solid var(--role-r2-dot); }
+textarea.role-r3:focus, select.role-r3:focus { outline:2px solid var(--role-r3-dot); }
+input.role-self:disabled, textarea.role-self:disabled, select.role-self:disabled,
+input.role-r1:disabled,   textarea.role-r1:disabled,   select.role-r1:disabled,
+input.role-r2:disabled,   textarea.role-r2:disabled,   select.role-r2:disabled,
+input.role-r3:disabled,   textarea.role-r3:disabled,   select.role-r3:disabled {
+  background: var(--locked-bg); color: var(--text); -webkit-text-fill-color: var(--text); cursor: not-allowed; opacity: 1;
+}
+/* 예시 항목명 입력칸(작성 가능할 때만 칸 모양으로 표시) */
+.achv-card-head .label-input.role-self:not(:disabled) { background: var(--role-self); border:1px solid var(--line); border-radius:8px; padding:9px 11px; }
+.achv-card-head .label-input.role-self:not(:disabled):focus { background: var(--role-self); outline:2px solid var(--role-self-dot); }
+
+/* 표 머리글/라벨의 역할 색 점 */
+.role-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; border:1px solid rgba(255,255,255,.75); }
+.role-dot.self { background: var(--role-self-dot); }
+.role-dot.r1 { background: var(--role-r1-dot); }
+.role-dot.r2 { background: var(--role-r2-dot); }
+.role-dot.r3 { background: var(--role-r3-dot); }
+
+/* 로그인한 역할 안내 배너 */
+.role-banner { word-break: keep-all; overflow-wrap: anywhere; padding:12px 14px; border-radius:10px; background: var(--gray-bg); border:1px solid var(--line); font-size:14px; font-weight:600; margin-bottom:14px; line-height:2; }
+.role-banner .role-sub { font-size:13px; font-weight:500; color: var(--text-dim); line-height:1.6; margin-top:4px; }
+.role-chip { display:inline-block; padding:1px 10px; border-radius:999px; font-weight:800; font-size:13px; border:1px solid rgba(0,0,0,.1); margin:0 2px; white-space:nowrap; }
+.role-chip.self { background: var(--role-self); color: var(--role-self-ink); }
+.role-chip.r1 { background: var(--role-r1); color: var(--role-r1-ink); }
+.role-chip.r2 { background: var(--role-r2); color: var(--role-r2-ink); }
+.role-chip.r3 { background: var(--role-r3); color: var(--role-r3-ink); }
+.role-chip.locked { background: var(--locked-bg); color: var(--text); }
+
+/* 입력 내용이 길어지면 칸이 위아래로 자동 확장 (JS가 켜져 있을 때만) */
+textarea.autogrow { overflow: hidden; resize: none; }
+
 /* ---- 카드형 자기업적 레이아웃 ---- */
 .achv-cards { display:flex; flex-direction:column; gap:16px; }
 .achv-card { background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
@@ -248,6 +305,7 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
   background:var(--gray-bg); border-bottom:1px solid var(--line);
 }
 .achv-card-head .label-input { min-width: 140px; }
+.achv-card-head .label-input.fixed { word-break: keep-all; overflow-wrap: anywhere; line-height:1.45; }
 .achv-no { width:28px; height:28px; border-radius:50%; background:var(--navy); color:#fff;
   display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; }
 .achv-card-head .req-tag, .achv-card-head .ex-tag { flex-shrink:0; }
@@ -262,14 +320,14 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
 .achv-field label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
 .achv-field textarea {
   width:100%; min-height:130px; padding:13px 14px; border:1px solid var(--line); border-radius:9px; font-size:15px;
-  font-weight:500; background:var(--green); color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
+  font-weight:500; color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
 }
 .achv-field textarea:focus { outline:2px solid var(--green-strong); border-color:transparent; }
 .achv-field textarea:disabled { cursor:not-allowed; opacity:1; }
 .achv-impact label { display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:6px; }
 .achv-impact textarea {
   width:100%; min-height:150px; padding:13px 14px; border:1px solid var(--line); border-radius:9px;
-  font-size:15px; font-weight:500; background:var(--green); color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
+  font-size:15px; font-weight:500; color:var(--text); font-family:inherit; line-height:1.6; resize:vertical;
 }
 .achv-impact textarea:focus { outline:2px solid var(--green-strong); border-color:transparent; }
 .achv-impact textarea:disabled { cursor:not-allowed; opacity:1; }
@@ -306,6 +364,24 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
   .actions-row { width: 100%; }
   .formhead { flex-direction: column; align-items: stretch; }
   .formhead .actions-row { justify-content: flex-start; }
+
+  /* 4·5번 표: 휴대폰에서는 항목별 카드로 (글자가 세로로 쪼개지는 문제 방지) */
+  table.comp-tbl, table.comp-tbl tbody, table.comp-tbl tr, table.comp-tbl td { display:block; width:100% !important; min-width:0 !important; }
+  table.comp-tbl thead { display:none; }
+  table.comp-tbl { border:none !important; font-size:14px; }
+  table.comp-tbl tr { border:1px solid var(--line); border-radius:12px; margin-bottom:12px; padding:12px 14px; background: var(--white); }
+  table.comp-tbl td { border:none !important; padding:3px 0 !important; }
+  table.comp-tbl td.c-label, table.comp-tbl td.c-label b { font-size:15px; }
+  table.comp-tbl td.c-desc { font-size:13px !important; margin-bottom:8px; line-height:1.5; }
+  table.comp-tbl td.col-grade { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 0 !important; }
+  table.comp-tbl td.col-grade::before { content: attr(data-label); font-weight:700; font-size:14px; flex:1; }
+  table.comp-tbl td.col-grade select.grade-sel { width:120px; flex:none; }
+
+  /* 하단 저장 바: 화면을 덜 가리도록 컴팩트하게 */
+  .savebar { padding:8px 10px; gap:6px; border-radius:10px; }
+  .savebar .save-msg { flex-basis:100%; font-size:11.5px; line-height:1.4; }
+  .savebar .actions-row { width:100%; flex-wrap:wrap; gap:6px; }
+  .savebar .actions-row .btn { flex:1 1 40%; justify-content:center; padding:9px 8px; font-size:13px; }
 }
 </style>
 </head>
@@ -448,6 +524,38 @@ function formatSubmittedAt(ms){
   const d = new Date(ms);
   const pad = (n)=>String(n).padStart(2,"0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ---- 입력 내용이 길어지면 작성칸이 위아래로 자동 확장 ----
+function autoGrowOne(el){
+  if (!el || el.offsetParent === null) return;           // 화면에 안 보이는 칸은 건드리지 않음
+  el.style.height = "auto";
+  const border = el.offsetHeight - el.clientHeight;
+  const h = el.scrollHeight + border;
+  if (h > 0) el.style.height = h + "px";
+}
+function autoGrow(el){
+  const grid = el.closest && el.closest(".achv-grid3");
+  const multiCol = grid && getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length > 1;
+  if (!multiCol){ autoGrowOne(el); return; }
+  // PC: 전년실적/목표/실적 3칸은 가장 긴 칸 높이에 맞춰 나란히 맞춤
+  const tas = [...grid.querySelectorAll("textarea")];
+  tas.forEach(t => { t.style.height = "auto"; });
+  const max = Math.max(...tas.map(t => t.scrollHeight + (t.offsetHeight - t.clientHeight)));
+  if (max > 0) tas.forEach(t => { t.style.height = max + "px"; });
+}
+function initAutoGrow(root){
+  (root || document).querySelectorAll(".achv-field textarea, .achv-impact textarea, textarea.wide").forEach(el=>{
+    el.classList.add("autogrow");
+    autoGrow(el);
+    if (!el._agBound){ el.addEventListener("input", ()=>autoGrow(el)); el._agBound = true; }
+  });
+}
+let _agTimer = null;
+window.addEventListener("resize", ()=>{ clearTimeout(_agTimer); _agTimer = setTimeout(()=>initAutoGrow(document.getElementById("app")), 150); });
+if (document.fonts){
+  if (document.fonts.ready) document.fonts.ready.then(()=>initAutoGrow(document.getElementById("app")));
+  if (document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", ()=>initAutoGrow(document.getElementById("app")));
 }
 // unlockedRoles / globalRoles / gateStep은 페이지를 새로고침하면 초기화됩니다 (세션 한정 보호).
 
@@ -876,37 +984,64 @@ function renderDetail(id){
         <div class="achv-no">${i+1}</div>
         ${a.locked ? '<span class="req-tag">필수</span>' : ''}
         ${a.req
-            ? `<input class="label-input" value="${escapeHtml(a.label)}" disabled />`
-            : `<input class="label-input" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="아래 예시 항목을 참고하여 자유롭게 작성해 주세요"/>`}
+            ? `<div class="label-input fixed">${escapeHtml(a.label)}</div>`
+            : `<input class="label-input role-self" type="text" data-ach="${i}" data-f="label" value="${escapeHtml(a.label)}" ${fieldDisabled(id,["self"])} placeholder="아래 예시 항목을 참고하여 자유롭게 작성해 주세요"/>`}
         ${(!a.locked && achvCanEdit) ? `<button class="btn btn-danger btn-sm" data-ach-del="${i}" title="항목 삭제">삭제</button>` : ''}
       </div>
       <div class="achv-card-body">
         <div class="achv-grid3">
-          <div class="achv-field"><label>전년 실적</label><textarea data-ach="${i}" data-f="prev" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.prev)}</textarea></div>
-          <div class="achv-field"><label>2026 목표</label><textarea data-ach="${i}" data-f="target" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.target)}</textarea></div>
-          <div class="achv-field"><label>2026 실적</label><textarea data-ach="${i}" data-f="actual" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.actual)}</textarea></div>
+          <div class="achv-field"><label>전년 실적</label><textarea class="role-self" data-ach="${i}" data-f="prev" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.prev)}</textarea></div>
+          <div class="achv-field"><label>2026 목표</label><textarea class="role-self" data-ach="${i}" data-f="target" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.target)}</textarea></div>
+          <div class="achv-field"><label>2026 실적</label><textarea class="role-self" data-ach="${i}" data-f="actual" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.actual)}</textarea></div>
         </div>
         <div class="achv-impact">
           <label>주요성과 및 경영효과</label>
-          <textarea data-ach="${i}" data-f="impact" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.impact)}</textarea>
+          <textarea class="role-self" data-ach="${i}" data-f="impact" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(a.impact)}</textarea>
         </div>
       </div>
     </div>`).join("");
 
-  const gradeOptions = (val, disabled, cls) => `<select class="grade-sel ${cls||''}" ${disabled} data-grade-val>
+  const gradeOptions = (val, disabled, role) => `<select class="grade-sel role-${role}" ${disabled} data-grade-val>
       <option value="" ${!val?'selected':''}>-</option>
       ${GRADE_DEF.map(g=>`<option value="${g.g}" ${val===g.g?'selected':''}>${g.g}</option>`).join("")}
     </select>`;
 
+  const compCell = (i, f, label, val) => {
+    const hidden = selfOnlyMode && f !== "self";
+    return `<td class="col-grade" data-label="${label}" ${hidden ? '' : `data-comp="${i}" data-f="${f}"`}>${hidden ? mask("") : gradeOptions(val, fieldDisabled(id,[f]), f)}</td>`;
+  };
+  const overallCell = (key, f, label, val) => {
+    return `<td class="col-grade" data-label="${label}" ${selfOnlyMode ? '' : `data-overall="${key}" data-f="${f}"`}>${selfOnlyMode ? mask("") : gradeOptions(val, fieldDisabled(id,[f]), f)}</td>`;
+  };
+
   const compRows = rec.competencies.map((c,i)=>`
     <tr>
-      <td class="label-cell"><b>${escapeHtml(c.label)}</b></td>
-      <td class="label-cell" style="color:var(--text-dim); font-size:12px;">${escapeHtml(c.desc)}</td>
-      <td class="col-grade" data-comp="${i}" data-f="self">${gradeOptions(c.self, fieldDisabled(id,["self"]))}</td>
-      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r1"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r1, fieldDisabled(id,["r1"]), "ev")}</td>
-      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r2"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r2, fieldDisabled(id,["r2"]), "ev")}</td>
-      <td class="col-grade" ${selfOnlyMode ? '' : `data-comp="${i}" data-f="r3"`}>${selfOnlyMode ? mask("") : gradeOptions(c.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+      <td class="label-cell c-label"><b>${escapeHtml(c.label)}</b></td>
+      <td class="label-cell c-desc" style="color:var(--text-dim); font-size:12px;">${escapeHtml(c.desc)}</td>
+      ${compCell(i,"self","본인평가",c.self)}
+      ${compCell(i,"r1","1차평가",c.r1)}
+      ${compCell(i,"r2","2차평가",c.r2)}
+      ${compCell(i,"r3","3차평가",c.r3)}
     </tr>`).join("");
+
+  // 로그인한 역할에 맞는 "내가 작성할 칸(색상)" 안내
+  const ROLE_COLOR = { self:"연두색", r1:"주황색", r2:"하늘색", r3:"보라색" };
+  const roleChip = (r, extra) => `<span class="role-chip ${r}">${ROLE_COLOR[r]} 칸${extra ? " · " + extra : ""}</span>`;
+  const roleBannerHtml = (() => {
+    if (selfOnlyMode){
+      return `<div class="role-banner screen-only">👤 본인(피평가자)으로 로그인됨 — ${roleChip("self")}만 작성하실 수 있습니다. <span class="role-chip locked">회색 칸</span>은 수정할 수 없습니다.</div>`;
+    }
+    if (isAdminRole()){
+      const names = [...state.globalRoles].filter(r=>r==="hr"||r==="lead").map(r=>({hr:"인사팀",lead:"팀장"}[r])).join("·");
+      return `<div class="role-banner screen-only">🛠 ${names} 권한 — 모든 칸을 작성하실 수 있습니다.<br>칸 색상: ${roleChip("self","본인")} ${roleChip("r1","1차")} ${roleChip("r2","2차")} ${roleChip("r3","3차")}</div>`;
+    }
+    const mine = ["r1","r2"].filter(r => state.globalRoles.has(r));
+    const nameOf = { r1:"1차 평가자", r2:"2차 평가자" };
+    let subs = "";
+    if (mine.includes("r1") && isR1Done(rec)) subs += `<div class="role-sub">※ 1차 평가는 이미 제출되어 현재 수정할 수 없습니다. 수정이 필요하면 인사팀에 재오픈을 요청해 주세요.</div>`;
+    if (mine.includes("r2") && isR2Done(rec)) subs += `<div class="role-sub">※ 2차 평가는 이미 제출되어 현재 수정할 수 없습니다. 수정이 필요하면 인사팀에 재오픈을 요청해 주세요.</div>`;
+    return `<div class="role-banner screen-only">✍ ${mine.map(r=>nameOf[r]).join("·")}(으)로 로그인됨 — ${mine.map(r=>roleChip(r)).join(" ")}만 작성하실 수 있습니다. <span class="role-chip locked">회색 칸</span>은 읽기 전용입니다.${subs}</div>`;
+  })();
 
   const gradeRefRows = `
     <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
@@ -940,11 +1075,7 @@ function renderDetail(id){
 
     ${effectiveDeadline(rec) ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">🗓 본인(피평가자) 작성 마감: ${escapeHtml(formatDeadlineKo(effectiveDeadline(rec)))}${rec.deadlineOverride ? ' (이 분만 개별 연장됨)' : ''}</div>` : ''}
 
-    <div class="note strong screen-only">${
-      selfOnlyMode
-        ? `본인(피평가자)으로 로그인됨 — 본인 작성 칸만 수정할 수 있고, 1차·2차·3차 평가 내용은 비공개입니다.`
-        : `'${[...state.globalRoles].map(r=>({hr:"인사팀",lead:"팀장",r1:"1차 평가자",r2:"2차 평가자"}[r])).join(", ")}' 권한으로 전체 내용을 보고 있습니다.`
-    }</div>
+    ${roleBannerHtml}
     ${r2GateNote ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 1차 평가가 아직 완료되지 않아 2차 평가란은 작성하실 수 없습니다. 1차 평가 완료 후 다시 시도해 주세요.</div>` : ''}
     ${selfOnlyMode && isPastSelfDeadline(rec) && !isSelfDone(rec) ? `<div class="note strong screen-only" style="background:#fdecea; color:#b3261e;">⚠ 본인 작성 기간(${escapeHtml(effectiveDeadline(rec))})이 종료되어 더 이상 작성하실 수 없습니다. 문의사항은 인사팀으로 연락해 주세요.</div>` : ''}
     ${r3GateNote ? `<div class="note strong screen-only" style="background:#eef2ff; color:#2448b0;">ℹ 2차 평가가 완료되면, 3차(최종) 평가자가 인쇄물에 작성한 내용을 이 화면에서 직접 입력할 수 있습니다.</div>` : ''}
@@ -966,13 +1097,13 @@ function renderDetail(id){
     <div class="section screen-only">
       <h2><span class="num">2</span>부족한 부분</h2>
       <p class="note">2026년 활동을 기준으로, 목표 대비 미흡했던 부분·기대에 미치지 못한 영역을 구체적으로 기술</p>
-      <textarea class="wide" id="f-shortfalls" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.shortfalls)}</textarea>
+      <textarea class="wide role-self" id="f-shortfalls" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.shortfalls)}</textarea>
     </div>
 
     <div class="section screen-only">
       <h2><span class="num">3</span>보완해야 할 사항</h2>
       <p class="note">부족한 부분을 개선하기 위해 향후 취해야 할 구체적 행동/계획</p>
-      <textarea class="wide" id="f-improvements" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.improvements)}</textarea>
+      <textarea class="wide role-self" id="f-improvements" ${fieldDisabled(id,["self"])} placeholder="내용을 입력해 주세요">${escapeHtml(rec.improvements)}</textarea>
     </div>
 
     <div class="section screen-only">
@@ -981,8 +1112,8 @@ function renderDetail(id){
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <table class="grade-ref">${gradeRefRows}</table>
       <div class="table-wrap" style="border:none;">
-        <table class="form-tbl">
-          <thead><tr><th>평가 항목</th><th>세부 평가 내용</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th></tr></thead>
+        <table class="form-tbl comp-tbl">
+          <thead><tr><th>평가 항목</th><th>세부 평가 내용</th><th><span class="role-dot self"></span>본인평가</th><th><span class="role-dot r1"></span>1차평가</th><th><span class="role-dot r2"></span>2차평가</th><th><span class="role-dot r3"></span>3차평가</th></tr></thead>
           <tbody>${compRows}</tbody>
         </table>
       </div>
@@ -992,20 +1123,20 @@ function renderDetail(id){
       <h2><span class="num">5</span>종합 등급 평가</h2>
       <p class="note strong">평가란에는 S / A / B / C / D 등급 문자로 선택해 주세요.</p>
       <div class="table-wrap" style="border:none;">
-      <table class="form-tbl" style="width:100%;">
-        <thead><tr><th>평가 영역</th><th>1차평가</th><th>2차평가</th><th>3차평가</th></tr></thead>
+      <table class="form-tbl comp-tbl" style="width:100%;">
+        <thead><tr><th>평가 영역</th><th><span class="role-dot r1"></span>1차평가</th><th><span class="role-dot r2"></span>2차평가</th><th><span class="role-dot r3"></span>3차평가</th></tr></thead>
         <tbody>
           <tr>
-            <td class="label-cell"><b>자기업적 달성도</b></td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r1"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r1, fieldDisabled(id,["r1"]), "ev")}</td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r2"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r2, fieldDisabled(id,["r2"]), "ev")}</td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="achv" data-f="r3"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.achv.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+            <td class="label-cell c-label"><b>자기업적 달성도</b></td>
+            ${overallCell("achv","r1","1차평가",rec.overall.achv.r1)}
+            ${overallCell("achv","r2","2차평가",rec.overall.achv.r2)}
+            ${overallCell("achv","r3","3차평가",rec.overall.achv.r3)}
           </tr>
           <tr>
-            <td class="label-cell"><b>부족한 부분·보완 이행 가능성</b></td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r1"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r1, fieldDisabled(id,["r1"]), "ev")}</td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r2"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r2, fieldDisabled(id,["r2"]), "ev")}</td>
-            <td class="col-grade" ${selfOnlyMode ? '' : 'data-overall="improve" data-f="r3"'}>${selfOnlyMode ? mask("") : gradeOptions(rec.overall.improve.r3, fieldDisabled(id,["r3"]), "ev")}</td>
+            <td class="label-cell c-label"><b>부족한 부분·보완 이행 가능성</b></td>
+            ${overallCell("improve","r1","1차평가",rec.overall.improve.r1)}
+            ${overallCell("improve","r2","2차평가",rec.overall.improve.r2)}
+            ${overallCell("improve","r3","3차평가",rec.overall.improve.r3)}
           </tr>
         </tbody>
       </table>
@@ -1017,12 +1148,12 @@ function renderDetail(id){
       <h2><span class="num">6</span>참고 의견 <span style="font-size:12px; font-weight:700; color:#8A5A00; background:#FFF3D6; padding:3px 9px; border-radius:999px; margin-left:4px;">선택 · 필요시만 작성</span></h2>
       <p class="note">자유롭게 남기고 싶은 의견이 있을 때만 작성해 주세요. 최종 제출 여부와는 무관합니다.</p>
       <div class="field" style="margin-bottom:18px;">
-        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;">1차 평가자 참고 의견</label>
-        <textarea class="wide" id="f-comment-r1" ${fieldDisabled(id,["r1"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:220px; border-style:dashed;">${escapeHtml(rec.comments?.r1||"")}</textarea>
+        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;"><span class="role-dot r1"></span>1차 평가자 참고 의견</label>
+        <textarea class="wide role-r1" id="f-comment-r1" ${fieldDisabled(id,["r1"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:220px; border-style:dashed;">${escapeHtml(rec.comments?.r1||"")}</textarea>
       </div>
       <div class="field">
-        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;">2차 평가자 참고 의견</label>
-        <textarea class="wide" id="f-comment-r2" ${fieldDisabled(id,["r2"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:220px; border-style:dashed;">${escapeHtml(rec.comments?.r2||"")}</textarea>
+        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-dim); margin-bottom:6px;"><span class="role-dot r2"></span>2차 평가자 참고 의견</label>
+        <textarea class="wide role-r2" id="f-comment-r2" ${fieldDisabled(id,["r2"])} placeholder="필요한 경우에만 작성해 주세요" style="min-height:220px; border-style:dashed;">${escapeHtml(rec.comments?.r2||"")}</textarea>
       </div>
     </div>`}
 
@@ -1059,7 +1190,7 @@ function renderSubmitBar(rec, id, selfOnlyMode){
     if (r3Editable) submitBtns.push(`<button class="btn btn-primary" id="btn-submit-r3">✅ 3차 평가 입력 완료</button>`);
     parts.push(`
       <div class="savebar screen-only">
-        <span class="save-msg" id="save-msg">작성 중간중간 '저장' 버튼을 눌러 저장해 주세요. 다 작성하시면 '최종 제출'을 눌러주세요.</span>
+        <span class="save-msg" id="save-msg">'저장' 버튼을 눌러야 저장됩니다. 다 작성하면 '최종 제출'을 눌러 주세요.</span>
         <div class="actions-row">
           <button class="btn btn-ghost" id="btn-save">임시 저장</button>
           ${submitBtns.join("")}
@@ -1110,7 +1241,7 @@ function renderPrintSheet(rec, tpl){
       <td style="${wrapStyle}"><b>${escapeHtml(c.label)}</b><br><span style="font-size:10.5px;color:#666;">${escapeHtml(c.desc)}</span></td>
       <td style="text-align:center; background:#E2F0D9;">${c.self||'-'}</td>
       <td style="text-align:center; background:#FCE4D6;">${c.r1||'-'}</td>
-      <td style="text-align:center; background:#FCE4D6;">${c.r2||'-'}</td>
+      <td style="text-align:center; background:#DCEBFA;">${c.r2||'-'}</td>
       <td style="text-align:center;">${c.r3||''}</td>
     </tr>`).join("");
 
@@ -1126,13 +1257,16 @@ function renderPrintSheet(rec, tpl){
     <p style="font-size:11.5px; margin:0 0 14px;">
       <span style="background:#E2F0D9; padding:2px 8px; border-radius:4px;">■ 본인 작성</span>
       &nbsp;&nbsp;
-      <span style="background:#FCE4D6; padding:2px 8px; border-radius:4px;">■ 평가자(1차·2차) 작성</span>
+      <span style="background:#FCE4D6; padding:2px 8px; border-radius:4px;">■ 1차 평가자 작성</span>
+      &nbsp;&nbsp;
+      <span style="background:#DCEBFA; padding:2px 8px; border-radius:4px;">■ 2차 평가자 작성</span>
       &nbsp;&nbsp; 흰 칸(3차)은 3차 평가자가 직접 기입합니다.
     </p>
 
     <div class="section" style="break-inside:avoid;">
       <h2>1. 자기업적</h2>
       <table class="form-tbl">
+        <colgroup><col style="width:5%"><col style="width:7%"><col style="width:22%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:27%"></colgroup>
         <thead><tr><th>No</th><th>구분</th><th>평가 항목</th><th>전년실적</th><th>2026목표</th><th>2026실적</th><th>주요성과 및 경영효과</th></tr></thead>
         <tbody>${achvRows}</tbody>
       </table>
@@ -1151,6 +1285,7 @@ function renderPrintSheet(rec, tpl){
       <h2>4. 임원 역량 평가 (본인 / 1차 / 2차 / 3차)</h2>
       <p style="font-size:11px; color:#666; margin:0 0 8px;">※ 3차 칸이 비어 있으면 3차 평가자가 직접 기입해 주세요.</p>
       <table class="form-tbl">
+        <colgroup><col style="width:36%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
         <thead><tr><th>평가 항목</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
         <tbody>${compRows}</tbody>
       </table>
@@ -1159,10 +1294,11 @@ function renderPrintSheet(rec, tpl){
     <div class="section" style="break-inside:avoid;">
       <h2>5. 종합 등급 평가</h2>
       <table class="form-tbl">
+        <colgroup><col style="width:46%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup>
         <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
         <tbody>
-          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r2||'-'}</td><td style="text-align:center;">${rec.overall.achv.r3||''}</td></tr>
-          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r2||'-'}</td><td style="text-align:center;">${rec.overall.improve.r3||''}</td></tr>
+          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#DCEBFA;">${rec.overall.achv.r2||'-'}</td><td style="text-align:center;">${rec.overall.achv.r3||''}</td></tr>
+          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#DCEBFA;">${rec.overall.improve.r2||'-'}</td><td style="text-align:center;">${rec.overall.improve.r3||''}</td></tr>
         </tbody>
       </table>
     </div>
@@ -1430,6 +1566,7 @@ function attachHandlers(){
 
   const rec = state.records[state.recordId];
   let dirty = false;
+  initAutoGrow(document.getElementById("app"));
 
   document.querySelectorAll("[data-ach]").forEach(el=>{
     el.addEventListener("input", ()=>{
@@ -1520,7 +1657,7 @@ function attachHandlers(){
 
   function markDirty(){
     const msg = document.getElementById("save-msg");
-    if (msg){ msg.textContent = "⚠ 저장되지 않은 변경사항이 있습니다 — '저장' 버튼을 눌러주세요."; msg.classList.remove("ok"); }
+    if (msg){ msg.textContent = "⚠ 저장되지 않은 변경사항이 있습니다 — '저장'을 눌러 주세요."; msg.classList.remove("ok"); }
   }
   async function doSave(manual){
     const ok = await saveRecord(state.recordId, rec);
