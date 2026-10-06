@@ -960,7 +960,11 @@ function renderSettings(){
       <td>${doneBadge(isR1Done(r))}</td>
       <td>${doneBadge(isR2Done(r))}</td>
       <td>${doneBadge(isR3Done(r))}</td>
-      <td>${r.deadlineOverride ? `<span class="status-chip status-r1_done">연장 ${escapeHtml(r.deadlineOverride)}</span>` : '<span style="color:var(--text-dim); font-size:12px;">공통</span>'}</td>
+      <td>
+        ${r.deadlineOverride ? `<span class="status-chip status-r1_done">연장 ${escapeHtml(r.deadlineOverride)}</span>` : `<span style="color:var(--text-dim); font-size:12px;">공통${state.config?.deadlineSelf ? ' · ' + escapeHtml(state.config.deadlineSelf) : ''}</span>`}
+        ${(isPastSelfDeadline(r) && !isSelfDone(r)) ? '<span class="status-chip" style="background:var(--warn-bg); color:var(--warn-ink);">마감 지남</span>' : ''}
+        <button class="btn btn-ghost btn-sm" data-deadline="${id}">기간 설정</button>
+      </td>
     </tr>`;
   }).join("");
 
@@ -1629,6 +1633,9 @@ function attachHandlers(){
 
   if (state.view === "settings"){
     document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
+    document.querySelectorAll("[data-deadline]").forEach(b=>{
+      b.addEventListener("click", ()=> openDeadlineModal(b.getAttribute("data-deadline")));
+    });
     document.getElementById("st-deadline-save")?.addEventListener("click", async ()=>{
       const val = document.getElementById("st-deadline").value;
       if (!val){ toast("날짜를 선택해 주세요."); return; }
@@ -1924,6 +1931,41 @@ function openAdminCodesModal(){
       if (ok){ toast("비밀번호가 초기화되었습니다."); wrap.remove(); openAdminCodesModal(); }
     });
   });
+}
+
+function openDeadlineModal(recordId){
+  const rec = state.records[recordId];
+  const common = state.config?.deadlineSelf || "";
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.innerHTML = `
+    <div class="modal">
+      <h3>${escapeHtml(rec.name)} 님 작성 기간 설정</h3>
+      <p class="note">전체 공통 마감: <b>${escapeHtml(formatDeadlineKo(common)) || "미설정"}</b><br>
+        이 분만 다른 날짜로 정하려면 아래에 날짜를 지정해 주세요. 지정한 날짜 12:00까지 작성할 수 있습니다.</p>
+      <div class="field">
+        <label>이 분의 개별 마감일</label>
+        <input type="date" id="dl-date" value="${escapeHtml(rec.deadlineOverride || "")}" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="dl-cancel">취소</button>
+        ${rec.deadlineOverride ? '<button class="btn btn-ghost" id="dl-clear">공통 마감일로 되돌리기</button>' : ''}
+        <button class="btn btn-primary" id="dl-save">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  wrap.addEventListener("click", (e)=>{ if (e.target===wrap) wrap.remove(); });
+  wrap.querySelector("#dl-cancel").onclick = ()=> wrap.remove();
+  const commit = async (value, msg) => {
+    rec.deadlineOverride = value || "";
+    const ok = await saveRecord(recordId, rec);
+    if (ok){ toast(msg); wrap.remove(); render(); }
+  };
+  wrap.querySelector("#dl-clear")?.addEventListener("click", ()=> commit("", "공통 마감일로 되돌렸습니다."));
+  wrap.querySelector("#dl-save").onclick = ()=>{
+    const v = wrap.querySelector("#dl-date").value;
+    commit(v, v ? `${rec.name} 님 마감일이 ${v}로 설정되었습니다.` : "공통 마감일로 되돌렸습니다.");
+  };
 }
 
 function openEditExecModal(recordId){
