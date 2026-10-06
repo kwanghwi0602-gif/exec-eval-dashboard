@@ -247,6 +247,9 @@ textarea.wide:disabled { cursor:not-allowed; opacity:1; }
   }
   table.form-tbl input, table.form-tbl textarea, select.grade-sel, textarea.wide { background:#fff !important; border:1px solid #bbb !important; color:#000 !important; }
   .print-wrap, .print-wrap * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  .print-wrap .section h2 { break-after: avoid; }
+  .toast { display:none !important; }
+  .print-wrap .section { padding: 6px 0 !important; margin-bottom: 12px; }
   .print-wrap table.form-tbl { table-layout: fixed; }
   .print-wrap table.form-tbl td, .print-wrap table.form-tbl th { word-break: break-word; }
 }
@@ -294,6 +297,39 @@ input.role-r3:disabled,   textarea.role-r3:disabled,   select.role-r3:disabled {
 
 /* 입력 내용이 길어지면 칸이 위아래로 자동 확장 (JS가 켜져 있을 때만) */
 textarea.autogrow { overflow: hidden; resize: none; }
+
+
+@page { size: A4; margin: 12mm; }
+/* ---- 3차 평가자용 인쇄본: 작성 화면과 같은 구성 + 흑백에서도 구분되는 작성자 라벨 ---- */
+.pc-tag { display:inline-block; font-size:10.5px; font-weight:700; padding:1px 8px; border:1px solid #555; border-radius:999px; margin:0 3px; vertical-align:middle; color:#222; background:#fff; white-space:nowrap; }
+.pc-tag.self { background:#E2F0D9; }
+.pc-tag.r1 { background:#FCE4D6; }
+.pc-tag.r2 { background:#DCEBFA; }
+.pc-tag.r3 { background:#fff; border-style:dashed; }
+.pc-card { border:1px solid #888; border-radius:6px; margin-bottom:10px; break-inside:avoid; page-break-inside:avoid; overflow:hidden; }
+.pc-head { display:flex; align-items:center; gap:8px; padding:7px 10px; background:#f1f2f4; border-bottom:1px solid #bbb; }
+.pc-no { width:20px; height:20px; border-radius:50%; background:#1F3864; color:#fff; font-size:11px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pc-req { font-size:10.5px; font-weight:800; padding:1px 6px; border:1px solid #1F3864; border-radius:4px; color:#1F3864; flex-shrink:0; }
+.pc-title { flex:1; font-weight:700; font-size:12.5px; word-break:keep-all; overflow-wrap:anywhere; }
+.pc-empty { font-weight:500; color:#888; }
+.pc-body { padding:9px 10px; }
+.pc-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px; }
+.pc-lbl { font-size:10.5px; font-weight:700; color:#444; margin-bottom:3px; }
+.pc-val { border:1px solid #999; border-radius:4px; padding:6px 8px; min-height:44px; font-size:12px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+.pc-val.tall { min-height:70px; }
+.pc-val.box { min-height:80px; }
+.pc-val.self { background:#E2F0D9; }
+.pc-val.r1 { background:#FCE4D6; }
+.pc-val.r2 { background:#DCEBFA; }
+.pc-opt { font-size:11px; font-weight:600; color:#666; margin-left:6px; }
+.pc-tbl td.pc-lab { font-size:12px; }
+.pc-tbl td.pc-desc { font-size:11px; color:#555; overflow-wrap:anywhere; }
+.pc-tbl td.pc-g { text-align:center; font-weight:700; font-size:13px; height:34px; }
+.pc-tbl td.pc-g.self { background:#E2F0D9; }
+.pc-tbl td.pc-g.r1 { background:#FCE4D6; }
+.pc-tbl td.pc-g.r2 { background:#DCEBFA; }
+.pc-tbl td.pc-g.r3 { background:#fff; }
+.pc-sub { font-size:9.5px; font-weight:600; margin-top:2px; opacity:.95; }
 
 /* ---- 카드형 자기업적 레이아웃 ---- */
 .achv-cards { display:flex; flex-direction:column; gap:16px; }
@@ -1224,103 +1260,119 @@ function renderSubmitBar(rec, id, selfOnlyMode){
 }
 
 function renderPrintSheet(rec, tpl){
-  const wrapStyle = "white-space:pre-wrap; word-break:break-word;";
-  const achvRows = rec.achievements.map((a,i)=>`
-    <tr>
-      <td style="text-align:center;">${i+1}</td>
-      <td style="text-align:center;">${a.req?'필수':'예시'}</td>
-      <td style="${wrapStyle}">${escapeHtml(a.label)}</td>
-      <td style="background:#E2F0D9; ${wrapStyle}">${escapeHtml(a.prev)||'-'}</td>
-      <td style="background:#E2F0D9; ${wrapStyle}">${escapeHtml(a.target)||'-'}</td>
-      <td style="background:#E2F0D9; ${wrapStyle}">${escapeHtml(a.actual)||'-'}</td>
-      <td style="background:#E2F0D9; ${wrapStyle}">${escapeHtml(a.impact)||'-'}</td>
-    </tr>`).join("");
+  const t = (v) => escapeHtml(v || "");
+  const TAG = { self:"본인 작성", r1:"1차 평가자 작성", r2:"2차 평가자 작성", r3:"3차 평가자 기입" };
+  const tag = (role) => `<span class="pc-tag ${role}">${TAG[role]}</span>`;
 
+  // 1. 자기업적 — 작성 화면과 같은 카드 구성 (빈 카드도 그대로 출력)
+  const cards = rec.achievements.map((a,i)=>`
+    <div class="pc-card">
+      <div class="pc-head">
+        <span class="pc-no">${i+1}</span>
+        ${a.locked ? '<span class="pc-req">필수</span>' : ''}
+        <span class="pc-title">${t(a.label) || '<span class="pc-empty">(항목명 미작성)</span>'}</span>
+        ${tag("self")}
+      </div>
+      <div class="pc-body">
+        <div class="pc-grid3">
+          <div><div class="pc-lbl">전년 실적</div><div class="pc-val self">${t(a.prev)}</div></div>
+          <div><div class="pc-lbl">2026 목표</div><div class="pc-val self">${t(a.target)}</div></div>
+          <div><div class="pc-lbl">2026 실적</div><div class="pc-val self">${t(a.actual)}</div></div>
+        </div>
+        <div class="pc-lbl">주요성과 및 경영효과</div>
+        <div class="pc-val self tall">${t(a.impact)}</div>
+      </div>
+    </div>`).join("");
+
+  // 4. 임원 역량 평가 — 작성 화면과 같은 열 구성(평가항목/세부내용/본인/1차/2차/3차)
   const compRows = rec.competencies.map(c=>`
     <tr>
-      <td style="${wrapStyle}"><b>${escapeHtml(c.label)}</b><br><span style="font-size:10.5px;color:#666;">${escapeHtml(c.desc)}</span></td>
-      <td style="text-align:center; background:#E2F0D9;">${c.self||'-'}</td>
-      <td style="text-align:center; background:#FCE4D6;">${c.r1||'-'}</td>
-      <td style="text-align:center; background:#DCEBFA;">${c.r2||'-'}</td>
-      <td style="text-align:center;">${c.r3||''}</td>
+      <td class="pc-lab"><b>${t(c.label)}</b></td>
+      <td class="pc-desc">${t(c.desc)}</td>
+      <td class="pc-g self">${t(c.self)}</td>
+      <td class="pc-g r1">${t(c.r1)}</td>
+      <td class="pc-g r2">${t(c.r2)}</td>
+      <td class="pc-g r3">${t(c.r3)}</td>
     </tr>`).join("");
+
+  const gradeRef = `
+    <table class="grade-ref">
+      <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
+      <tr><th>기준</th>${GRADE_DEF.map(g=>`<td>${g.label}</td>`).join("")}</tr>
+      <tr><th>점수</th>${GRADE_DEF.map(g=>`<td>${g.score}</td>`).join("")}</tr>
+    </table>`;
+
+  const th = (label, role) => `<th>${label}<div class="pc-sub">${TAG[role]}</div></th>`;
 
   return `
   <div class="print-wrap">
     <h1 style="text-align:center; margin-bottom:2px;">2026년 임원 인사 평가표</h1>
     <p style="text-align:center; font-weight:700; margin-top:0;">[${tpl.label}] — 3차(최종) 평가자 검토용</p>
-    <table class="form-tbl" style="margin-bottom:14px;">
-      <tr><th>성명</th><td>${escapeHtml(rec.name)}</td><th>직위</th><td>${escapeHtml(rec.title||'')}</td></tr>
-      <tr><th>소속</th><td>${escapeHtml(rec.dept||'')}</td><th>평가기간</th><td>${escapeHtml(rec.evalPeriod)}</td></tr>
+    <table class="form-tbl" style="margin-bottom:10px;">
+      <tr><th>성명</th><td>${t(rec.name)}</td><th>직위</th><td>${t(rec.title)}</td></tr>
+      <tr><th>소속</th><td>${t(rec.dept)}</td><th>평가기간</th><td>${t(rec.evalPeriod)}</td></tr>
       <tr><th>제출일</th><td colspan="3">${escapeHtml(formatSubmittedAt(rec.submitted?.selfAt))}</td></tr>
     </table>
-    <p style="font-size:11.5px; margin:0 0 14px;">
-      <span style="background:#E2F0D9; padding:2px 8px; border-radius:4px;">■ 본인 작성</span>
-      &nbsp;&nbsp;
-      <span style="background:#FCE4D6; padding:2px 8px; border-radius:4px;">■ 1차 평가자 작성</span>
-      &nbsp;&nbsp;
-      <span style="background:#DCEBFA; padding:2px 8px; border-radius:4px;">■ 2차 평가자 작성</span>
-      &nbsp;&nbsp; 흰 칸(3차)은 3차 평가자가 직접 기입합니다.
+    <p style="font-size:11.5px; margin:0 0 12px; line-height:2;">
+      ${tag("self")} ${tag("r1")} ${tag("r2")} ${tag("r3")}
+      &nbsp; 칸의 색과 라벨은 작성자를 뜻합니다. 3차 칸이 비어 있으면 3차 평가자가 직접 기입해 주세요.
     </p>
 
-    <div class="section" style="break-inside:avoid;">
+    <div class="section pc-sec" style="break-inside:auto;">
       <h2>1. 자기업적</h2>
-      <table class="form-tbl">
-        <colgroup><col style="width:5%"><col style="width:7%"><col style="width:22%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:27%"></colgroup>
-        <thead><tr><th>No</th><th>구분</th><th>평가 항목</th><th>전년실적</th><th>2026목표</th><th>2026실적</th><th>주요성과 및 경영효과</th></tr></thead>
-        <tbody>${achvRows}</tbody>
-      </table>
+      ${cards}
     </div>
 
-    <div class="section" style="break-inside:avoid;">
-      <h2>2. 부족한 부분</h2>
-      <div class="print-answer-box">${escapeHtml(rec.shortfalls) || '(작성 내용 없음)'}</div>
-    </div>
-    <div class="section" style="break-inside:avoid;">
-      <h2>3. 보완해야 할 사항</h2>
-      <div class="print-answer-box">${escapeHtml(rec.improvements) || '(작성 내용 없음)'}</div>
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>2. 부족한 부분 ${tag("self")}</h2>
+      <div class="pc-val self box">${t(rec.shortfalls)}</div>
     </div>
 
-    <div class="section" style="break-inside:avoid;">
-      <h2>4. 임원 역량 평가 (본인 / 1차 / 2차 / 3차)</h2>
-      <p style="font-size:11px; color:#666; margin:0 0 8px;">※ 3차 칸이 비어 있으면 3차 평가자가 직접 기입해 주세요.</p>
-      <table class="form-tbl">
-        <colgroup><col style="width:36%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
-        <thead><tr><th>평가 항목</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>3. 보완해야 할 사항 ${tag("self")}</h2>
+      <div class="pc-val self box">${t(rec.improvements)}</div>
+    </div>
+
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>4. 임원 역량 평가</h2>
+      ${gradeRef}
+      <table class="form-tbl pc-tbl">
+        <colgroup><col style="width:19%"><col style="width:33%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
+        <thead><tr><th>평가 항목</th><th>세부 평가 내용</th>${th("본인평가","self")}${th("1차평가","r1")}${th("2차평가","r2")}${th("3차평가","r3")}</tr></thead>
         <tbody>${compRows}</tbody>
       </table>
     </div>
 
-    <div class="section" style="break-inside:avoid;">
+    <div class="section pc-sec" style="break-inside:avoid;">
       <h2>5. 종합 등급 평가</h2>
-      <table class="form-tbl">
+      <table class="form-tbl pc-tbl">
         <colgroup><col style="width:46%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup>
-        <thead><tr><th>평가 영역</th><th>1차</th><th>2차</th><th>3차</th></tr></thead>
+        <thead><tr><th>평가 영역</th>${th("1차평가","r1")}${th("2차평가","r2")}${th("3차평가","r3")}</tr></thead>
         <tbody>
-          <tr><td><b>자기업적 달성도</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.achv.r1||'-'}</td><td style="text-align:center; background:#DCEBFA;">${rec.overall.achv.r2||'-'}</td><td style="text-align:center;">${rec.overall.achv.r3||''}</td></tr>
-          <tr><td><b>부족한 부분·보완 이행 가능성</b></td><td style="text-align:center; background:#FCE4D6;">${rec.overall.improve.r1||'-'}</td><td style="text-align:center; background:#DCEBFA;">${rec.overall.improve.r2||'-'}</td><td style="text-align:center;">${rec.overall.improve.r3||''}</td></tr>
+          <tr><td class="pc-lab"><b>자기업적 달성도</b></td><td class="pc-g r1">${t(rec.overall.achv.r1)}</td><td class="pc-g r2">${t(rec.overall.achv.r2)}</td><td class="pc-g r3">${t(rec.overall.achv.r3)}</td></tr>
+          <tr><td class="pc-lab"><b>부족한 부분·보완 이행 가능성</b></td><td class="pc-g r1">${t(rec.overall.improve.r1)}</td><td class="pc-g r2">${t(rec.overall.improve.r2)}</td><td class="pc-g r3">${t(rec.overall.improve.r3)}</td></tr>
         </tbody>
       </table>
     </div>
 
-    <div class="section" style="break-inside:avoid;">
-      <h2>6. 참고 의견 (선택)</h2>
-      <table class="form-tbl">
-        <tr><th style="width:18%;">1차 평가자</th><td style="${wrapStyle}">${escapeHtml(rec.comments?.r1) || '(작성 내용 없음)'}</td></tr>
-        <tr><th>2차 평가자</th><td style="${wrapStyle}">${escapeHtml(rec.comments?.r2) || '(작성 내용 없음)'}</td></tr>
-      </table>
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>6. 참고 의견 <span class="pc-opt">(선택 — 필요시 작성)</span></h2>
+      <div class="pc-lbl">1차 평가자 참고 의견 ${tag("r1")}</div>
+      <div class="pc-val r1 box" style="margin-bottom:10px;">${t(rec.comments?.r1)}</div>
+      <div class="pc-lbl">2차 평가자 참고 의견 ${tag("r2")}</div>
+      <div class="pc-val r2 box">${t(rec.comments?.r2)}</div>
     </div>
 
-    <div class="section" style="break-inside:avoid;">
-      <h2>7. 최종 종합등급 산출 (3차 평가자 기입)</h2>
+    <div class="section pc-sec" style="break-inside:avoid;">
+      <h2>7. 최종 종합등급 산출 <span class="pc-opt">(3차 평가자 기입)</span></h2>
       <div class="formula-box" style="background:#f2f2f2;">최종점수 = 4번(임원역량평가) 점수 × 30% + 5번(종합등급평가) 점수 × 70%</div>
       <table class="grade-ref">
         <tr><th>등급</th>${GRADE_DEF.map(g=>`<td><b>${g.g}</b></td>`).join("")}</tr>
         <tr><th>점수 구간</th><td>95↑</td><td>85~94</td><td>75~84</td><td>65~74</td><td>65 미만</td></tr>
       </table>
       <table class="form-tbl" style="margin-top:10px;">
-        <tr><th style="width:30%;">최종점수</th><td></td></tr>
-        <tr><th>최종 등급</th><td></td></tr>
+        <tr><th style="width:30%;">최종점수</th><td style="height:34px;"></td></tr>
+        <tr><th>최종 등급</th><td style="height:34px;"></td></tr>
       </table>
     </div>
 
