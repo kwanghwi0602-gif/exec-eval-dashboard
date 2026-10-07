@@ -126,10 +126,10 @@ h2 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
 .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); background: var(--white); }
 table.list { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 760px; }
 table.list th {
-  text-align: left; padding: 12px 14px; background: var(--navy); color: #fff; font-weight: 700;
+  text-align: left; padding: 12px 9px; background: var(--navy); color: #fff; font-weight: 700;
   font-size: 12.5px; white-space: nowrap;
 }
-table.list td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+table.list td { padding: 10px 9px; border-top: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
 table.list th { white-space: nowrap; }
 table.list tr:hover td { background: #fafbfd; }
 .pos-tag { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space:nowrap; }
@@ -360,6 +360,28 @@ textarea.autogrow { overflow: hidden; resize: none; }
 .pc-tbl td.pc-g.r3 { background:#fff; }
 .pc-sub { font-size:9.5px; font-weight:600; margin-top:2px; opacity:.95; }
 
+
+/* 현황 화면(표가 넓음)은 컨테이너 폭을 넓게 */
+.app.wide { max-width: 1440px; }
+
+/* ---- 진행현황 요약 / 마감일 바 ---- */
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:0 0 16px; }
+.stat { background:var(--white); border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:var(--shadow); }
+.stat-label { font-size:12.5px; font-weight:700; color:var(--text-dim); }
+.stat-num { font-size:24px; font-weight:800; margin:2px 0 8px; }
+.stat-num span { font-size:13px; font-weight:600; color:var(--text-dim); }
+.stat-bar { height:6px; border-radius:999px; background:var(--locked-bg); overflow:hidden; }
+.stat-bar i { display:block; height:100%; border-radius:999px; background:var(--navy); }
+.stat.self .stat-bar i { background:var(--role-self-dot); }
+.stat.r1 .stat-bar i { background:var(--role-r1-dot); }
+.stat.r2 .stat-bar i { background:var(--role-r2-dot); }
+.stat.r3 .stat-bar i { background:var(--role-r3-dot); }
+.stat .role-dot { border-color: var(--line); }
+.deadline-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:14px 18px; margin-bottom:16px; }
+.deadline-bar input[type="date"] { padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; background:var(--white); color:var(--text); }
+.deadline-bar .db-note { font-size:12.5px; color:var(--text-dim); flex:1; min-width:220px; line-height:1.5; }
+@media (max-width: 720px) { .stat-grid { grid-template-columns:repeat(2,1fr); } }
+
 /* ---- 카드형 자기업적 레이아웃 ---- */
 .achv-cards { display:flex; flex-direction:column; gap:16px; }
 .achv-card { background:var(--white); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
@@ -447,6 +469,24 @@ textarea.autogrow { overflow: hidden; resize: none; }
   .savebar .save-msg { flex-basis:100%; font-size:11.5px; line-height:1.4; }
   .savebar .actions-row { width:100%; flex-wrap:wrap; gap:6px; }
   .savebar .actions-row .btn { flex:1 1 40%; justify-content:center; padding:9px 8px; font-size:13px; }
+
+  /* 현황 표: 휴대폰에서는 임원 1명 = 카드 1장 (옆으로 밀지 않고 진행상태가 한눈에) */
+  .hero p { word-break: keep-all; overflow-wrap: anywhere; }
+  .list-wrap { border:none !important; background:transparent !important; overflow:visible !important; }
+  table.list.list-cards { min-width:0 !important; display:block; }
+  table.list.list-cards thead { display:none; }
+  table.list.list-cards tbody { display:block; }
+  table.list.list-cards tr { display:block; position:relative; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px; box-shadow:var(--shadow); }
+  table.list.list-cards td { display:block; border:none !important; padding:3px 0 !important; white-space:normal !important; width:auto; }
+  table.list.list-cards td.c-name { font-size:17px; padding-bottom:2px !important; padding-right:34px !important; }
+  table.list.list-cards td.c-meta { display:inline-block; margin-right:8px; font-size:13.5px; color:var(--text-dim); }
+  table.list.list-cards td.c-stat, table.list.list-cards td.c-adm { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  table.list.list-cards td.c-stat::before, table.list.list-cards td.c-adm::before { content:attr(data-label); font-weight:700; font-size:13.5px; color:var(--text); flex:none; }
+  table.list.list-cards td.c-adm > span { text-align:right; }
+  table.list.list-cards td.c-stat[data-label="본인평가"] { margin-top:8px; padding-top:9px !important; border-top:1px dashed var(--line) !important; }
+  table.list.list-cards td.c-check { position:absolute; top:12px; right:12px; padding:0 !important; }
+  table.list.list-cards td.c-actions { display:flex; gap:8px; flex-wrap:wrap; text-align:left !important; padding-top:10px !important; }
+  table.list.list-cards td.c-actions .btn { flex:1 1 28%; justify-content:center; }
 }
 </style>
 </head>
@@ -777,13 +817,13 @@ function render(){
   const app = document.getElementById("app");
   if (state.loading){ app.innerHTML = '<div class="empty-state">불러오는 중…</div>'; return; }
   const hasAccess = state.globalRoles.size > 0 || isUnlocked(state.recordId, "self");
+  if (state.view === "settings") state.view = "list";   // 설정 화면은 현황 화면으로 통합됨
   if (state.view === "list"){
     app.innerHTML = state.globalRoles.size ? renderList() : renderGate();
-  } else if (state.view === "settings"){
-    app.innerHTML = isAdminRole() ? renderSettings() : (state.globalRoles.size ? renderList() : renderGate());
   } else {
     app.innerHTML = hasAccess ? renderDetail(state.recordId) : renderGate();
   }
+  app.classList.toggle("wide", state.view === "list" && state.globalRoles.size > 0);
   updateNav();
   attachHandlers();
 }
@@ -791,9 +831,7 @@ function render(){
 function updateNav(){
   const nav = document.getElementById("topnav");
   if (!state.globalRoles.size){ nav.innerHTML = ``; return; }
-  const admin = isAdminRole();
-  nav.innerHTML = `<button data-v="list" class="${state.view==='list'?'active':''}">목록</button>
-       ${admin ? `<button data-v="settings" class="${state.view==='settings'?'active':''}">⚙ 설정</button>` : ''}
+  nav.innerHTML = `<button data-v="list" class="${state.view==='list'?'active':''}">현황</button>
        <button data-v="logout" style="background:rgba(255,255,255,.08);">로그아웃</button>`;
 }
 
@@ -873,7 +911,7 @@ function renderList(){
   const errBanner = lastLoadError
     ? `<div class="note strong warn screen-only" style="margin-bottom:14px;">⚠ 데이터를 불러오는 중 문제가 발생했습니다 (${escapeHtml(String(lastLoadError))}). 새로고침해도 계속되면 같은 계정/브라우저로 접속했는지 확인해 주세요.</div>`
     : "";
-  const admin = isAdminRole();
+  const admin = isAdminRole();   // 인사팀/팀장: 관리 기능 전체, 1차/2차 평가자: 진행현황만
   const ids = Object.keys(state.records).sort((idA,idB)=>{
     const a = state.records[idA], b = state.records[idB];
     const posA = a.position === "sales" ? 0 : 1, posB = b.position === "sales" ? 0 : 1;
@@ -888,20 +926,60 @@ function renderList(){
   [...selectedForDelete].forEach(id => { if (!state.records[id]) selectedForDelete.delete(id); });
   const allSelected = admin && ids.length > 0 && ids.every(id => selectedForDelete.has(id));
 
+  // ---- 진행현황 요약 ----
+  const N = ids.length;
+  const cnt = (fn) => ids.filter(id => fn(state.records[id])).length;
+  const stat = (label, n, role) => `
+    <div class="stat ${role}">
+      <div class="stat-label"><span class="role-dot ${role}"></span>${label}</div>
+      <div class="stat-num">${n}<span> / ${N}명</span></div>
+      <div class="stat-bar"><i style="width:${N ? Math.round(n / N * 100) : 0}%"></i></div>
+    </div>`;
+  const summary = `
+    <div class="stat-grid">
+      ${stat("본인 작성 제출", cnt(isSelfDone), "self")}
+      ${stat("1차 평가 완료", cnt(isR1Done), "r1")}
+      ${stat("2차 평가 완료", cnt(isR2Done), "r2")}
+      ${stat("3차 평가 입력", cnt(isR3Done), "r3")}
+    </div>`;
+
+  // ---- 작성 마감일 (인사팀/팀장만) ----
+  const deadline = (state.config && state.config.deadlineSelf) || "";
+  const deadlineBar = admin ? `
+    <div class="card deadline-bar">
+      <b>본인(피평가자) 작성 마감일</b>
+      <input type="date" id="st-deadline" value="${escapeHtml(deadline)}" />
+      <button class="btn btn-primary btn-sm" id="st-deadline-save">저장</button>
+      <span class="db-note">${deadline ? escapeHtml(formatDeadlineKo(deadline)) + " · 이후 본인 작성이 자동으로 잠깁니다." : "마감일이 설정되지 않았습니다."}
+        임원별 연장은 아래 표의 [기간 설정]에서 합니다.</span>
+      ${isPastSelfDeadline() ? '<span class="status-chip" style="background:var(--warn-bg); color:var(--warn-ink);">공통 마감 지남</span>' : ''}
+    </div>` : "";
+
+  // ---- 표 ----
   const rows = ids.map(id=>{
     const r = state.records[id];
     const posTag = r.position === "sales" ? '<span class="pos-tag pos-sales">영업직</span>' : '<span class="pos-tag pos-nonsales">비영업직</span>';
+    const adminCells = admin ? `
+      <td class="c-adm" data-label="사번"><span>${escapeHtml(r.codes?.self?.empId||"")}${r.codes?.self?.password ? '' : ' <span class="status-chip status-draft">비번 미설정</span>'}</span></td>` : '';
+    const adminDeadline = admin ? `
+      <td class="c-adm" data-label="마감일"><span>
+        ${r.deadlineOverride ? `<span class="status-chip status-r1_done">연장 ${escapeHtml(r.deadlineOverride)}</span>` : `<span style="color:var(--text-dim); font-size:12px;">공통${deadline ? ' · ' + escapeHtml(deadline) : ''}</span>`}
+        ${(isPastSelfDeadline(r) && !isSelfDone(r)) ? '<span class="status-chip" style="background:var(--warn-bg); color:var(--warn-ink);">마감 지남</span>' : ''}
+        <button class="btn btn-ghost btn-sm" data-deadline="${id}">기간 설정</button>
+      </span></td>` : '';
     return `<tr data-open="${id}">
-      ${admin ? `<td style="width:36px;" onclick="event.stopPropagation()"><input type="checkbox" data-select-id="${id}" ${selectedForDelete.has(id)?'checked':''} style="width:16px;height:16px;"/></td>` : ''}
-      <td><b>${escapeHtml(r.name)}</b></td>
-      <td>${escapeHtml(r.dept||"")}</td>
-      <td>${escapeHtml(r.title||"")}</td>
-      <td>${posTag}</td>
-      <td>${doneBadge(isSelfDone(r))}</td>
-      <td>${doneBadge(isR1Done(r))}</td>
-      <td>${doneBadge(isR2Done(r))}</td>
-      <td>${doneBadge(isR3Done(r))}</td>
-      <td style="text-align:right; white-space:nowrap;">
+      ${admin ? `<td class="c-check" style="width:36px;" onclick="event.stopPropagation()"><input type="checkbox" data-select-id="${id}" ${selectedForDelete.has(id)?'checked':''} style="width:16px;height:16px;"/></td>` : ''}
+      <td class="c-name"><b>${escapeHtml(r.name)}</b></td>
+      <td class="c-meta">${escapeHtml(r.dept||"")}</td>
+      <td class="c-meta">${escapeHtml(r.title||"")}</td>
+      <td class="c-meta">${posTag}</td>
+      ${adminCells}
+      <td class="c-stat" data-label="본인평가">${doneBadge(isSelfDone(r))}</td>
+      <td class="c-stat" data-label="1차평가">${doneBadge(isR1Done(r))}</td>
+      <td class="c-stat" data-label="2차평가">${doneBadge(isR2Done(r))}</td>
+      <td class="c-stat" data-label="3차평가">${doneBadge(isR3Done(r))}</td>
+      ${adminDeadline}
+      <td class="c-actions" style="text-align:right; white-space:nowrap;">
         <button class="btn btn-ghost btn-sm" data-open="${id}">열기</button>
         ${admin ? `<button class="btn btn-ghost btn-sm" data-codes="${id}">코드 보기</button>` : ''}
         ${admin ? `<button class="btn btn-danger btn-sm" data-del="${id}">삭제</button>` : ''}
@@ -910,18 +988,22 @@ function renderList(){
   }).join("");
 
   const tableOrEmpty = ids.length ? `
-    <div class="table-wrap">
-      <table class="list">
+    <div class="table-wrap list-wrap">
+      <table class="list list-cards">
         <thead><tr>
           ${admin ? `<th style="width:36px;"><input type="checkbox" id="select-all" ${allSelected?'checked':''} style="width:16px;height:16px;"/></th>` : ''}
-          <th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th><th></th>
+          <th>성명</th><th>소속</th><th>직위</th><th>포지션</th>
+          ${admin ? '<th>사번</th>' : ''}
+          <th>본인평가</th><th>1차평가</th><th>2차평가</th><th>3차평가</th>
+          ${admin ? '<th>마감일</th>' : ''}
+          <th></th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>` : `
     <div class="card empty-state">
       <div class="big">등록된 임원이 없습니다</div>
-      ${admin ? "아래 '+ 임원 추가' 버튼으로 평가 대상을 등록해 주세요." : "인사팀에 문의해 주세요."}
+      ${admin ? "위 '+ 임원 추가' 버튼으로 평가 대상을 등록해 주세요." : "인사팀에 문의해 주세요."}
     </div>`;
 
   const roleNameMap = { hr:"인사팀", lead:"팀장", r1:"1차 평가자", r2:"2차 평가자" };
@@ -933,69 +1015,14 @@ function renderList(){
       <div><h1>임원 인사평가 현황</h1><p>본인 작성 → 1차 평가 → 2차 평가까지 온라인으로 진행합니다. 3차(최종) 평가는 인쇄물로 진행해 주세요. (${escapeHtml(loggedInAs)}(으)로 접속 중)</p></div>
       <div class="actions-row">
         ${admin && selectedForDelete.size ? `<button class="btn btn-danger" id="btn-bulk-del">선택 삭제 (${selectedForDelete.size})</button>` : ''}
+        ${admin ? `<button class="btn btn-ghost" id="btn-change-code">관리자 코드 관리</button>` : ''}
         ${admin ? `<button class="btn btn-ghost" id="btn-bulk-add">📤 엑셀로 일괄 추가</button>` : ''}
         ${admin ? `<button class="btn btn-primary" id="btn-add">+ 임원 추가</button>` : ''}
       </div>
     </div>
+    ${summary}
+    ${deadlineBar}
     ${tableOrEmpty}
-  `;
-}
-
-function renderSettings(){
-  const isAdmin = state.globalRoles.has("hr") || state.globalRoles.has("lead");
-  const ids = Object.keys(state.records).sort((a,b)=> (state.records[a].createdAt||0) - (state.records[b].createdAt||0));
-  const deadline = (state.config && state.config.deadlineSelf) || "";
-
-  const infoRows = ids.map(id=>{
-    const r = state.records[id];
-    const posLabel = r.position === "sales" ? "영업직" : "비영업직";
-    return `<tr>
-      <td><b>${escapeHtml(r.name)}</b></td>
-      <td>${escapeHtml(r.dept||"")}</td>
-      <td>${escapeHtml(r.title||"")}</td>
-      <td>${posLabel}</td>
-      <td>${escapeHtml(r.codes?.self?.empId||"")}</td>
-      <td>${r.codes?.self?.password ? '설정됨' : '미설정'}</td>
-      <td>${doneBadge(isSelfDone(r))}</td>
-      <td>${doneBadge(isR1Done(r))}</td>
-      <td>${doneBadge(isR2Done(r))}</td>
-      <td>${doneBadge(isR3Done(r))}</td>
-      <td>
-        ${r.deadlineOverride ? `<span class="status-chip status-r1_done">연장 ${escapeHtml(r.deadlineOverride)}</span>` : `<span style="color:var(--text-dim); font-size:12px;">공통${state.config?.deadlineSelf ? ' · ' + escapeHtml(state.config.deadlineSelf) : ''}</span>`}
-        ${(isPastSelfDeadline(r) && !isSelfDone(r)) ? '<span class="status-chip" style="background:var(--warn-bg); color:var(--warn-ink);">마감 지남</span>' : ''}
-        <button class="btn btn-ghost btn-sm" data-deadline="${id}">기간 설정</button>
-      </td>
-    </tr>`;
-  }).join("");
-
-  const infoTableOrEmpty = ids.length ? `
-    <div class="table-wrap">
-      <table class="list">
-        <thead><tr><th>성명</th><th>소속</th><th>직위</th><th>포지션</th><th>사번</th><th>비밀번호</th><th>본인</th><th>1차</th><th>2차</th><th>3차</th><th>마감일</th></tr></thead>
-        <tbody>${infoRows}</tbody>
-      </table>
-    </div>` : `<div class="card empty-state">등록된 임원이 없습니다.</div>`;
-
-  return `
-    <div class="hero">
-      <div><h1>⚙ 설정</h1><p>작성 기간 및 전체 피평가자 현황을 관리합니다.</p></div>
-      <div class="actions-row">
-        <button class="btn btn-ghost" id="btn-change-code">관리자 코드 관리</button>
-      </div>
-    </div>
-
-    <div class="card" style="padding:18px 20px; margin-bottom:20px; max-width:480px;">
-      <h2 style="border:none; padding:0; margin-bottom:10px;">본인(피평가자) 작성 기간</h2>
-      <p class="note" style="margin-bottom:12px;">이 날짜 자정까지만 본인 작성 칸이 활성화됩니다. 이후에는 자동으로 잠깁니다.</p>
-      ${isAdmin ? `
-        <div class="field"><input type="date" id="st-deadline" value="${escapeHtml(deadline)}" /></div>
-        <button class="btn btn-primary" id="st-deadline-save">저장</button>
-      ` : `<p><b>${escapeHtml(deadline) || "설정되지 않음"}</b></p>`}
-      ${isPastSelfDeadline() ? '<p class="note strong" style="margin-top:10px;">⚠ 현재 마감일이 지나 본인 작성이 잠겨 있습니다.</p>' : ''}
-    </div>
-
-    <h2 style="margin-bottom:10px;">전체 피평가자 정보</h2>
-    ${infoTableOrEmpty}
   `;
 }
 
@@ -1120,7 +1147,7 @@ function renderDetail(id){
   return `
     ${selfOnlyMode ? '' : `
     <div class="back-row screen-only">
-      <button class="linklike" id="back-list">← 목록으로</button>
+      <button class="linklike" id="back-list">← 현황으로</button>
     </div>`}
     <div class="formhead screen-only">
       <div class="idblock">
@@ -1568,6 +1595,15 @@ function attachHandlers(){
     document.getElementById("btn-add")?.addEventListener("click", openAddModal);
     document.getElementById("btn-bulk-add")?.addEventListener("click", openBulkUploadModal);
     document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
+    document.querySelectorAll("[data-deadline]").forEach(b=>{
+      b.addEventListener("click", (e)=>{ e.stopPropagation(); openDeadlineModal(b.getAttribute("data-deadline")); });
+    });
+    document.getElementById("st-deadline-save")?.addEventListener("click", async ()=>{
+      const val = document.getElementById("st-deadline").value;
+      if (!val){ toast("날짜를 선택해 주세요."); return; }
+      const ok = await saveConfig({ ...(state.config||{}), deadlineSelf: val });
+      if (ok){ toast("작성 마감일이 저장되었습니다."); render(); }
+    });
 
     document.querySelectorAll("[data-select-id]").forEach(cb=>{
       cb.addEventListener("change", ()=>{
@@ -1627,20 +1663,6 @@ function attachHandlers(){
         state.view = "detail"; state.recordId = id;
         render();
       });
-    });
-    return;
-  }
-
-  if (state.view === "settings"){
-    document.getElementById("btn-change-code")?.addEventListener("click", openAdminCodesModal);
-    document.querySelectorAll("[data-deadline]").forEach(b=>{
-      b.addEventListener("click", ()=> openDeadlineModal(b.getAttribute("data-deadline")));
-    });
-    document.getElementById("st-deadline-save")?.addEventListener("click", async ()=>{
-      const val = document.getElementById("st-deadline").value;
-      if (!val){ toast("날짜를 선택해 주세요."); return; }
-      const ok = await saveConfig({ ...(state.config||{}), deadlineSelf: val });
-      if (ok){ toast("작성 기간이 저장되었습니다."); render(); }
     });
     return;
   }
